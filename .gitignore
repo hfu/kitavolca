@@ -1,0 +1,31 @@
+# OS/editor
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Build outputs
+dst/
+work/
+temp/
+*.pmtiles
+*.mbtiles
+
+# Runtime/intermediate data files
+*.ndjson
+
+# Local input datasets (downloaded manually)
+src/*.zip
+
+# Generated test fixtures (keep scripts, ignore generated data files)
+test_data/**/*.shp
+test_data/**/*.shx
+test_data/**/*.dbf
+test_data/**/*.prj
+test_data/**/*.geojson
+test_data/**/*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
