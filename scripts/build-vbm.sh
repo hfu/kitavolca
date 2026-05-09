@@ -63,15 +63,18 @@ docker run --rm -i \
     jq -c '
         del(.properties["ID番号"]) |
         (.properties["分類コード"] // null) as $code |
-        if ($code == 7102 or $code == 7106 or $code == 7133 or $code == 7135) then
-            .properties["tippecanoe.minzoom"] = 11
-        else
-            .
-        end |
         if $code == null then
             .
         else
-            .properties["tippecanoe.layer"] = ($code | tostring)
+            .tippecanoe = {
+                "layer": ($code | tostring)
+            }
+            |
+            if ($code == 7102 or $code == 7106 or $code == 7133 or $code == 7135) then
+                .tippecanoe.minzoom = 11
+            else
+                .
+            end
         end
     ' < "$WORK_DIR/all_raw.ndjson" > "$WORK_DIR/vbm_filtered.ndjson"
 
