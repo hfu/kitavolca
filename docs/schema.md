@@ -1,38 +1,116 @@
-# Schema Definition (TBD)
+# Schema Definition
 
-**This document is to be completed after the first successful pipeline run with real input data.**
+**実データ（樽前山 VBM/VLCM）に基づき確定。** 測定コマンドと結果は各節に記載。
 
-## Purpose
+## VBM Schema
 
-Define which attributes (fields) to preserve from the raw Shapefile data during the conversion to PMTiles. This determines what information is available for styling and querying in MapLibre.
+### 元属性（Shapefile → GeoJSONSeq 変換直後）
 
-## VBM Schema (To be determined)
+`分類コード` の値によって、属性の組み合わせは以下の9パターンに分かれる（`work/vbm/all_raw.ndjson` を実測）。
 
-**Status**: TBD — Pending inspection of actual VBM Shapefile attributes
+| 属性キーの組み合わせ | ジオメトリ型 | 代表 `分類コード` |
+|---|---|---|
+| ID番号, 出典コード, 出典レベル, 分類コード, 注記, 表示区分 | LineString | 1102, 1103, 2101, 2103, 2106, 2107, 2301, 2306, 2311, 5101, 5102, 5106, 5202, 5211, 5226-5239, 6201 |
+| ID番号, 出典コード, 出典レベル, 分類コード, 注記 | Polygon | 3001-3004 |
+| ID番号, 出典コード, 出典レベル, 分類コード, 注記, 表示区分 | Polygon | 5112 |
+| ID番号, 出典コード, 分類コード, 名称 | MultiPoint | 3581, 3582, 4257, 6221, 6222, 6241, 6242 |
+| ID番号, 出典コード, 分類コード, 注記 | LineString | 4265 |
+| ID番号, 出典コード, 分類コード, 名称, 表示区分 | LineString | 5265 |
+| ID番号, 出典コード, 分類コード, 標高, 表示区分 | LineString | 7101, 7102, 7105, 7106（等高線） |
+| ID番号, 出典コード, 出典レベル, 分類コード, 水深, 表示区分 | LineString | 7132, 7133, 7134（等深線） |
+| ID番号, 出典コード, 分類コード, 水深値 | MultiPoint | 7135 |
+| ID番号, 三角点標高, 出典コード, 分類コード, 水準点標高, 表示区分 | MultiPoint | 7301-7308（三角点・水準点） |
+| ID番号, 出典コード, 分類コード, 注記 | MultiPoint | 8110-8171（注記点） |
 
-- Planned decision point: After `just build-vbm` produces first output, review layer attributes and decide which fields to retain.
-- Factors:
-  - Data size impact (more attributes = larger tiles)
-  - Rendering utility (is the attribute useful for styling?)
-  - Privacy/sensitivity (should certain fields be excluded?)
+測定コマンド:
+```bash
+jq -r '[(.properties["分類コード"]|tostring), .geometry.type, (.properties|keys|sort|join("|"))] | @tsv' work/vbm/all_raw.ndjson | sort -u
+```
 
-## VLCM Schema (To be determined)
+### 保持する属性（確定）
 
-**Status**: TBD — Pending inspection of actual VLCM Shapefile attributes
+`scripts/build-vbm.sh` の実装通り、以下を採用する。
 
-- Planned decision point: After `just build-vlcm` produces first output, review layer attributes and decide which fields to retain.
-- Expected attributes may include:
-  - `natural` source-layer: terrain type, slope, altitude indicators (likely)
-  - `artificial` source-layer: infrastructure, construction-related classifications (likely)
+- **削除**: `ID番号`（feature 内シーケンス番号。スタイリング・クエリに無価値なため削除）
+- **保持（そのまま）**: `出典コード`, `出典レベル`, `標高`, `水深`, `水深値`, `名称`, `注記`, `表示区分`, `三角点標高`, `水準点標高`, `分類コード`
+  - いずれも小さいスカラー値で、タイルサイズへの影響は軽微
+  - `分類コード` は `properties` 内にも残したまま、`tippecanoe.layer`（文字列化）としても複製する。フィルタ用に文字列比較しやすくするため
+- **追加**: feature 直下の `tippecanoe.layer`（`分類コード` の文字列版）。`tippecanoe.minzoom = 11` を等高線・等深線系コードにのみ付与
 
-## Refinement Process
+### 分類コードの実測分布（樽前山データ、全 201,939 features）
 
-1. **Inspect**: Run `just inspect` to see raw attributes in input ZIPs
-2. **Build**: Run `just build-vlcm` / `just build-vbm` and generate initial tiles
-3. **Validate**: Run `just validate` and inspect tile contents
-4. **Review**: Examine which attributes appear in the PMTiles output
-5. **Refine**: Update `scripts/build-vlcm.sh` and `scripts/build-vbm.sh` to filter/rename attributes as needed
-6. **Document**: Complete this file with final schema decisions
+上位のみ抜粋（全件は `jq -r '.tippecanoe.layer' work/vbm/vbm_filtered.ndjson | sort | uniq -c | sort -rn` で再現可能）:
+
+| 分類コード | 件数 | 備考 |
+|---|---|---|
+| 3001 | 112,444 | Polygon、最多 |
+| 2101 | 29,863 | LineString |
+| 7102 | 16,837 | 等高線、minzoom=11 適用 |
+| 2106 | 15,175 | LineString |
+| 5101 | 5,685 | LineString |
+| 7106 | 824 | 等高線、minzoom=11 適用 |
+| 7133 | 13 | 等深線、minzoom=11 適用 |
+| 7135 | 1 | 水深値点、minzoom=11 適用 |
+
+### 等高線・等深線コードの minzoom=11 対象選定の根拠（実測により確定）
+
+`7101/7102`, `7105/7106` は同じ属性形状（標高を持つ LineString）だが、`分類コード` ごとの標高値の分布を実測すると、明確な「計曲線（強調線・間引かれた線）/ 主曲線（通常線・密な線）」のペア構造になっていることがわかった。
+
+測定コマンド:
+```bash
+jq -r 'select(.properties["分類コード"]==<code>) | .properties["標高"]' work/vbm/all_raw.ndjson \
+  | awk '{tot++; if ($1 % 25 == 0) m25++} END{print m25"/"tot}'
+```
+
+結果:
+
+| 分類コード | 件数 | 標高が25の倍数の割合 | 解釈 |
+|---|---|---|---|
+| 7101 | 3,723 | 3722/3723 (99.97%) | **計曲線**（25m間隔の強調線） |
+| 7102 | 16,837 | 1/16,837 (0.01%) | **主曲線**（5m間隔。7101と重複する25の倍数を意図的に除外） |
+| 7105 | 90 | 80/90 (88.9%) | 補助曲線系の計曲線 |
+| 7106 | 824 | 3/824 (0.36%) | 補助曲線系の主曲線 |
+
+7102 は7101（25の倍数）をほぼ完全に除外しており（16,837件中1件のみ例外）、7101と7102が「同じ地形を、間引いた強調表示用（計曲線）」と「全間隔表示用（主曲線）」に意図的に分割していることが確認できる。7105/7106も同型のペア。
+
+**結論**: `minzoom=11` が付与されている `7102, 7106` は各ペアの「主曲線（密度が高く、低ズームでは線が密集しすぎる）」側であり、`7101, 7105`（計曲線・間引き済みで密度が低い）は同じ理由でのズーム制限が不要なため対象外——という設計は密度データと整合しており、見落としではなく合理的な選択だったと判断できる。
+
+### 未解決事項（水深系: 7132/7133/7134）
+
+等深線側にも同様の計曲線/主曲線ペア構造がある可能性が高いが（`7133` のみ `minzoom=11` 対象）、樽前山データでは該当件数が極端に少なく（7132: 9件, 7133: 13件, 7134: 3件）、標高系と同じ手法で統計的に裏付けるには不十分。水深値も 0.25/0.5/0.63/0.88 とバラつきがあり、単純な倍数関係では説明しきれない。
+
+- 海岸線・湖沼を含む火山（例: 支笏湖に近いエリア、有珠山の噴火湾側など）のデータで再測定し、同じ「間引き倍数関係」が成立するか確認すること
+- 現状は `7133` のみ対象のままとし、新たな根拠が得られるまで変更しない
+
+## VLCM Schema
+
+### 元属性
+
+`work/vlcm/natural.ndjson`, `work/vlcm/artificial.ndjson` を実測（`jq -r '.properties | keys | join(",")' | sort -u`）。
+
+- `ID`, `code1`, `code2`, `code3`, `code4`, `name` のみ。全レイヤ共通で、VBM のような分岐はない
+- `code1`〜`code4` は階層的な分類コード（桁数が増えるほど詳細）。例: `code1=1, code2=101, code3=10101, code4=1010101, name=火口跡`
+- `name` はすでに日本語の人間可読ラベル（VBM の数値 `分類コード` と異なり、別途コード表を参照しなくても意味がわかる）
+
+### 保持する属性（確定）
+
+- **全属性をそのまま保持**（フィルタ不要）。属性数が少なく（6キー固定）、`name` が既に人間可読なため、削除・変換の必要性がない
+
+### natural / artificial の実測件数（樽前山データ）
+
+| source-layer | 件数 | ジオメトリ内訳 |
+|---|---|---|
+| natural | 1,581 | Polygon 1,556 / LineString 25 |
+| artificial | 13 | Polygon 13（全件 `code2=105`, `name=人工改変地`） |
+
+`artificial` が極端に少ないのは樽前山エリアの人工改変地が実際に少ないためで、パイプラインの不具合ではない（ファイル名 `shizen`/`jinko` によるレイヤ振り分けは正しく機能している）。
+
+## Refinement Process（今後の火山データ追加時）
+
+1. 新しい火山の ZIP を `src/` に配置し `just inspect` で概要確認
+2. `just build-vlcm` / `just build-vbm` を実行
+3. 上記と同じ `jq` コマンドで属性キー・分類コード分布を実測し、本ドキュメントの表と差分がないか確認
+4. 差分があれば（未知の分類コードなど）、本ドキュメントと `scripts/build-vbm.sh` を更新
 
 ## References
 

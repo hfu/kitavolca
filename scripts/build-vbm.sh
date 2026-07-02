@@ -1,6 +1,7 @@
 #!/bin/bash
 # build-vbm.sh — VBM の ZIP 内 Shapefile から PMTiles を生成
 # 分類コードベースでフィルタリングし、等高線系コードに minzoom=11 を適用
+# ネイティブ実行（GDAL/jq/tippecanoe が PATH にあること）を前提とする
 
 set -euo pipefail
 
@@ -12,6 +13,10 @@ OUTPUT_FILE="${WORKSPACE_DIR}/dst/vbm.pmtiles"
 echo "=== VBM PMTiles 生成（樽前山テスト）==="
 echo ""
 
+for cmd in ogr2ogr gdal jq tippecanoe; do
+    command -v "$cmd" >/dev/null 2>&1 || { echo "❌ [事前チェック] '$cmd' が見つかりません。'just setup' で必要ツールを確認してください"; exit 1; }
+done
+
 mkdir -p "$WORK_DIR" "${WORKSPACE_DIR}/dst"
 rm -f "$WORK_DIR"/*.ndjson 2>/dev/null || true
 
@@ -21,77 +26,97 @@ else
     vbm_zip_list="$(ls "$INPUT_DIR"/*.zip 2>/dev/null | grep -Ei 'vbm|base' || true)"
 fi
 if [ -z "$vbm_zip_list" ]; then
-    echo "❌ VBM の ZIP が ${INPUT_DIR} に見つかりません"
+    echo "❌ [1. ZIP検出] VBM の ZIP が ${INPUT_DIR} に見つかりません"
     exit 1
 fi
 
 echo "1. ZIP から VBM レイヤを抽出・変換中..."
 
+# ZIP 内パスは CP932 由来で日本語ディレクトリ名を含むため、実ファイルとして
+# 展開せず GDAL VSI (/vsizip/) 上で直接列挙・変換する（macOS の unzip は
+# CP932 バイト列を APFS の UTF-8 パスとして書き出せず失敗するため）
+idx=0
+convert_errors=0
 for zipfile in $vbm_zip_list; do
     zipname="$(basename "$zipfile")"
     echo "   処理対象: ${zipname}"
 
-    docker run --rm \
-        -v "$INPUT_DIR:/data:ro" \
-        -v "$WORK_DIR:/work" \
-        kitavolca:latest \
-        bash -lc '
-            set -e
-            rm -rf /tmp/vbm_extract
-            mkdir -p /tmp/vbm_extract
-            unzip -oq "/data/'"$zipname"'" -d /tmp/vbm_extract
-            
-            # すべての .shp ファイルを GeoJSON Text Sequence に変換
-            idx=0
-            while IFS= read -r -d "" shp; do
-                echo "     - ${shp#/tmp/vbm_extract/}" >&2
-                ogr2ogr --config SHAPE_ENCODING CP932 -f GeoJSONSeq "/work/raw_${idx}.ndjson" "$shp" -skipfailures -nlt PROMOTE_TO_MULTI 2>/dev/null || true
-                idx=$((idx + 1))
-            done < <(find /tmp/vbm_extract -type f -name "*.shp" -print0)
-        '
+    shp_list="$(gdal vsi list -R -f json "/vsizip/${zipfile}" 2>&1 | jq -r '.[] | select(test("\\.shp$"; "i"))' || true)"
+    if [ -z "$shp_list" ]; then
+        echo "❌ [1. ZIP列挙] ${zipname} 内に .shp が見つかりません（gdal vsi list の失敗、またはアーカイブ構造が想定と異なる可能性）"
+        exit 1
+    fi
+
+    while IFS= read -r shp_rel; do
+        echo -n "     - ${shp_rel} ... "
+        if err="$(ogr2ogr --config SHAPE_ENCODING CP932 -f GeoJSONSeq "$WORK_DIR/raw_${idx}.ndjson" \
+            "/vsizip/${zipfile}/${shp_rel}" -skipfailures -nlt PROMOTE_TO_MULTI 2>&1)"; then
+            n=$(wc -l < "$WORK_DIR/raw_${idx}.ndjson" | tr -d ' ')
+            echo "${n} features"
+        else
+            echo "失敗"
+            echo "❌ [1. ogr2ogr変換] ${zipname} 内 ${shp_rel} の変換に失敗しました:"
+            echo "$err" | sed 's/^/       /'
+            convert_errors=$((convert_errors + 1))
+        fi
+        idx=$((idx + 1))
+    done <<< "$shp_list"
 done
+
+if [ "$convert_errors" -gt 0 ]; then
+    echo "❌ [1. ogr2ogr変換] ${convert_errors} 件のシェープファイルで変換に失敗しました。上記のエラー内容を確認してください"
+    exit 1
+fi
 
 echo ""
 echo "2. GeoJSON Text Sequence を属性フィルタリング中..."
 
-# すべての GeoJSON Text Sequence を結合して jq でフィルタリング
-cat "$WORK_DIR"/raw_*.ndjson > "$WORK_DIR/all_raw.ndjson"
-
-docker run --rm -i \
-    -v "$WORK_DIR:/work" \
-    kitavolca:latest \
-    jq -c '
-        del(.properties["ID番号"]) |
-        (.properties["分類コード"] // null) as $code |
-        if $code == null then
-            .
-        else
-            .tippecanoe = {
-                "layer": ($code | tostring)
-            }
-            |
-            if ($code == 7102 or $code == 7106 or $code == 7133 or $code == 7135) then
-                .tippecanoe.minzoom = 11
-            else
-                .
-            end
-        end
-    ' < "$WORK_DIR/all_raw.ndjson" > "$WORK_DIR/vbm_filtered.ndjson"
-
-if [ ! -s "$WORK_DIR/vbm_filtered.ndjson" ]; then
-    echo "❌ vbm_filtered.ndjson の生成に失敗しました"
+if ! cat "$WORK_DIR"/raw_*.ndjson > "$WORK_DIR/all_raw.ndjson" 2>&1; then
+    echo "❌ [2. 結合] raw_*.ndjson の結合に失敗しました（work/vbm/ 配下の中間ファイルを確認してください）"
     exit 1
 fi
 
+if [ ! -s "$WORK_DIR/all_raw.ndjson" ]; then
+    echo "❌ [2. 結合] all_raw.ndjson が空です（1. のいずれの shp からも feature が出力されていません）"
+    exit 1
+fi
+
+total_features=$(wc -l < "$WORK_DIR/all_raw.ndjson" | tr -d ' ')
+echo "   結合結果: ${total_features} features"
+
+if ! jq -c '
+    del(.properties["ID番号"]) |
+    (.properties["分類コード"] // null) as $code |
+    if $code == null then
+        .
+    else
+        .tippecanoe = {
+            "layer": ($code | tostring)
+        }
+        |
+        if ($code == 7102 or $code == 7106 or $code == 7133 or $code == 7135) then
+            .tippecanoe.minzoom = 11
+        else
+            .
+        end
+    end
+' < "$WORK_DIR/all_raw.ndjson" > "$WORK_DIR/vbm_filtered.ndjson" 2>&1; then
+    echo "❌ [2. jqフィルタリング] jq の実行に失敗しました（all_raw.ndjson の内容・エンコーディングを確認してください）"
+    exit 1
+fi
+
+if [ ! -s "$WORK_DIR/vbm_filtered.ndjson" ]; then
+    echo "❌ [2. jqフィルタリング] vbm_filtered.ndjson が空です"
+    exit 1
+fi
 
 echo ""
 echo "3. PMTiles を生成中..."
 
-docker run --rm \
-    -v "$WORK_DIR:/work:ro" \
-    -v "${WORKSPACE_DIR}/dst:/output" \
-    kitavolca:latest \
-    bash -lc 'tippecanoe --force -P -n "Tarumaezan VBM" -A "GSI" -N "tarumaezan-vbm" --no-progress-indicator -Z 5 -z 14 -o /output/vbm.pmtiles /work/vbm_filtered.ndjson'
+if ! tippecanoe --force -P -n "Tarumaezan VBM" -A "GSI" -N "tarumaezan-vbm" --no-progress-indicator -Z 5 -z 14 -o "${WORKSPACE_DIR}/dst/vbm.pmtiles" "$WORK_DIR/vbm_filtered.ndjson"; then
+    echo "❌ [3. tippecanoe] PMTiles 生成に失敗しました（上記の tippecanoe 出力を確認してください）"
+    exit 1
+fi
 
 echo ""
 echo "✓ VBM PMTiles 生成完了: ${OUTPUT_FILE}"

@@ -1,67 +1,58 @@
-# Zoom Policy (TBD)
+# Zoom Policy
 
-**This document is to be completed after the first successful pipeline run with real input data.**
+**実データ（樽前山 VBM/VLCM）に基づき確定。** 測定コマンドと結果は各節に記載。
 
-## Purpose
+## 現状の設定
 
-Define zoom level allocation for tiles, including:
-- Minimum zoom level (where tiling starts)
-- Maximum zoom level (maximum detail/resolution)
-- Feature simplification/generalization strategies per zoom range
-- Inclusion/exclusion rules (e.g., which features appear at which zoom levels)
+- `scripts/build-vbm.sh`: `tippecanoe --force -P -n "Tarumaezan VBM" ... -Z 5 -z 14`
+- `scripts/build-vlcm.sh`: `tippecanoe --force -P ... -Z 5 -z 14 -L natural:... -L artificial:...`
 
-## VBM Zoom Policy (To be determined)
+`-Z 5`（最小ズーム5）〜`-z 14`（最大ズーム14）で両方とも共通。`-P`（並列読み込み）以外の簡略化オプションは未指定＝tippecanoe のデフォルト挙動（`--drop-densest-as-needed` などは未使用）。
 
-**Status**: TBD — Pending inspection of actual VBM Shapefile extent and geometry complexity
+## 実測結果
 
-### Planned Approach
+### VLCM: 警告なし
 
-1. **Initial Build**: `tippecanoe` currently configured with `-z 0 -Z 14` (zoom 0–14)
-2. **Assessment**: After first build, evaluate:
-   - Tile size distribution (are tiles too large at low zoom? Too small at high zoom?)
-   - Performance impact (does navigation feel responsive?)
-   - Geometry complexity (do small features become invisible at low zoom? Do they render correctly at high zoom?)
-3. **Refinement**: Adjust zoom levels and feature filtering rules based on observations
+`work/vlcm/natural.ndjson` + `work/vlcm/artificial.ndjson`（計 1,594 features, 639,449 bytes）でローカル tippecanoe（v2.79.0）を実行 → タイルサイズ警告は **0件**。データ量が小さく、現状の `-Z 5 -z 14` のままで問題ない。
 
-## VLCM Zoom Policy (To be determined)
+### VBM: ズーム 9〜12 で 5 タイルが 500KB 超過
 
-**Status**: TBD — Pending inspection of actual VLCM Shapefile extent and geometry complexity
+`work/vbm/vbm_filtered.ndjson`（201,939 features, 71,124,591 bytes）でローカル tippecanoe を実行し再現:
 
-### Planned Approach
-
-Same as VBM (see above).
-
-## Configuration
-
-The zoom policy is controlled in:
-- `scripts/build-vlcm.sh` — line with `tippecanoe ... -z 0 -Z 14`
-- `scripts/build-vbm.sh` — line with `tippecanoe ... -z 0 -Z 14`
-
-Example adjustment:
 ```bash
-# Current (default)
-tippecanoe -z 0 -Z 14 ...
-
-# If tiles are too large at low zoom:
-tippecanoe -z 2 -Z 15 ...
-
-# If simplification is needed (reduce detail at low zoom):
-tippecanoe -z 0 -Z 14 -r 2 ...  # -r sets tile resolution
+tippecanoe --force -P -n "Tarumaezan VBM" -A "GSI" -N "tarumaezan-vbm" -Z 5 -z 14 -o /tmp/vbm_test.pmtiles work/vbm/vbm_filtered.ndjson
 ```
 
-## Simplification Strategy
+出力された警告（すべて `>500000` bytes、tippecanoe のデフォルト上限）:
 
-tippecanoe supports multiple options for controlling feature detail:
+| タイル (z/x/y) | サイズ (bytes) | 上限超過率 |
+|---|---|---|
+| 9/457/188 | 563,814 | +12.8% |
+| 10/914/377 | 732,539 | +46.5% |
+| 11/1829/755 | 673,527 | +34.7% |
+| 11/1828/755 | 726,278 | +45.3% |
+| 12/3658/1510 | 562,430 | +12.5% |
 
-- **`-r<n>`**: Tile resolution (default 4; higher = more detail)
-- **`-C<n>`**: Tile cluster radius (default 50; prevents point clustering issues)
-- **Feature filtering**: Use `-w` to drop small features at low zoom
+いずれも樽前山中心部と同じ座標域（`457/188` 系列はズームが上がるごとに `914/377`→`1828-1829/755`→`3656-3660/1508-1511` と同一地点にズームインした先）。原因は、VBM の全 63 種類の `分類コード` を単一の tippecanoe レイヤ（`-L` 未指定のためファイル名由来の1レイヤ）にまとめて詰め込んでいるため、中〜高密度ズームで等高線(3001 Polygon 112,444件 / 2101,2106 LineString 合計45,000件超）が同一タイルに集中すること。
 
-### Decision Tree
+### 現時点の判断
 
-1. **Is tile size at zoom 0–2 too large?** → Reduce `-Z` or increase `-r`
-2. **Is there too much detail at low zoom?** → Increase simplification or use layer-specific zoom ranges
-3. **Are features disappearing unexpectedly?** → Reduce `-r` or lower `-z`
+- **単一火山（樽前山）のテストデータでは許容範囲**: 超過は最大+46.5%で、いずれも致命的な破損ではなく tippecanoe の警告レベル。実運用（複数火山の結合）でデータ量が増えると悪化する可能性が高い
+- **今は zoom 範囲・簡略化パラメータを変更しない**: 単一火山データのみでチューニングすると、複数火山を結合した際の挙動を見誤る恐れがある。複数火山のデータを追加した時点で再測定し、必要なら以下の対策を検討する:
+  - VBM も VLCM 同様に `分類コード` のグループ（等高線系・行政界系・注記系など）ごとに `-L` でレイヤを分割する
+  - `--drop-densest-as-needed` または `-al`（自動簡略化）を有効化する
+  - 低ズーム（5〜8程度）では注記・水準点などの点データを間引く（`-r`/`-B` の調整）
+
+## VBM/VLCM 共通の再測定手順
+
+新しい火山データを追加した後、または本番相当のデータ量になった時点で、以下を再実行してタイルサイズ警告を確認すること。
+
+```bash
+just build-vbm 2>&1 | grep -E "size is.*>500000"
+just build-vlcm 2>&1 | grep -E "size is.*>500000"
+```
+
+警告が増加・悪化した場合は、上記「現時点の判断」の対策リストから着手する。
 
 ## References
 
