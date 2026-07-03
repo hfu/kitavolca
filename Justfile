@@ -91,6 +91,12 @@ inspect:
     echo ""
     echo "次: 構造を確認後、'just build-vlcm' または 'just build-vbm' を実行"
 
+# fetch-vbm: GSI の一覧ページから指定火山の VBM Shapefile ZIP を取得し src/ へ配置（volcano_id は README 参照）
+fetch-vbm volcano_id:
+    #!/usr/bin/env bash
+    set -e
+    bash scripts/fetch-vbm.sh "{{volcano_id}}" "$(pwd)"
+
 # build-vlcm: VLCM から PMTiles を生成
 build-vlcm:
     #!/usr/bin/env bash

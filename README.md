@@ -48,8 +48,24 @@ brew install gdal tippecanoe jq just
 - **VBM（火山基本図）**: https://web1.gsi.go.jp/bousaichiri/vbm-data_hokkai_tohoku.html
 - **VLCM（火山土地条件図）**: https://web2.gsi.go.jp/bousaichiri/volcano-maps-vlcm-data.html
 
+#### VBM: `just fetch-vbm` で自動取得
+
+VBM一覧ページは静的HTMLで、火山ごとに `<a id="...">` アンカーと直後の Shapefile ZIP への直リンクを持つ構造になっているため、手動ダウンロードの代わりに以下で取得できる。
+
+```bash
+just fetch-vbm tarumae   # src/tarumae_vbm.zip として取得
+just fetch-vbm meakan    # src/meakan_vbm.zip
+just fetch-vbm usu       # src/usu_vbm.zip
+```
+
+`volcano_id` は一覧ページの `<a id="...">` 属性値（ページの HTML ソースで確認できる。例: `tarumae`, `meakan`, `taisetsu`, `tokachi`, `kuttara`, `usu`, `hokaikoma`）。該当する火山がまだ Shapefile 形式で提供されていない、または `volcano_id` が一覧に無い場合はエラーで終了する。
+
+#### VLCM: 現状は手動
+
+VLCM側は一覧ページの実際のダウンロード導線が未特定のため、当面は以下の手動手順のまま。
+
 1. Shapefile ZIP をダウンロード
-2. `src/` ディレクトリ直下へ配置（フラット構成）
+2. `src/` ディレクトリ直下へ配置（フラット構成、ファイル名は `<volcano_id>_vlcm.zip` を推奨）
 
 ### Git 運用メモ（重要）
 
@@ -92,6 +108,7 @@ just clean
 ## タスク一覧（Justfile）
 
 - `just setup` — 必須ツール（GDAL/tippecanoe/jq）の有無とバージョン確認
+- `just fetch-vbm <volcano_id>` — GSI の VBM 一覧ページから Shapefile ZIP を取得し `src/` へ配置
 - `just inspect` — ZIP を展開せずに内容確認（GDAL `/vsizip/`）
 - `just build-vlcm` — `dst/vlcm.pmtiles` を生成
 - `just build-vbm` — `dst/vbm.pmtiles` を生成

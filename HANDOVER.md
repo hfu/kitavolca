@@ -26,10 +26,16 @@
   - 理由: Docker daemon が起動していない環境でも Homebrew 版の GDAL/tippecanoe/jq がすでに動作しており、「Docker で再現性を担保する」という前提が実態と合っていなかった（中途半端な二重運用はかえって信頼性を損なう）
   - `Dockerfile` は削除。`scripts/build-vbm.sh` / `scripts/build-vlcm.sh` / `Justfile` はすべて `docker run` を使わず、PATH 上の `ogr2ogr`/`ogrinfo`/`tippecanoe`/`jq` を直接呼び出す
   - 前提ツールのバージョン固定は brew の formula 任せ（厳密なピン留めは未実装。必要になれば検討）
+- **2026-07-04: `src/` への VBM 入力データ取得を自動化した**
+  - `scripts/fetch-vbm.sh` + `just fetch-vbm <volcano_id>` で、GSI の VBM 一覧ページ（静的HTML、`<a id="...">` アンカー + 直後の `*-shp.zip` 直リンクという構造）から Shapefile ZIP を直接ダウンロードし `src/<volcano_id>_vbm.zip` に配置する
+  - `meakan`（雌阿寒岳）・`usu`（有珠山）で実際に取得 → `build-vbm.sh` まで通ることを確認済み
+  - VLCM側は一覧ページ（`web2.gsi.go.jp/bousaichiri/volcano-maps-vlcm-data.html`）の実際のダウンロード導線が未特定（静的HTMLにリンクが見当たらない）ため、自動化は未着手。手動ダウンロードのまま
+  - 実装上の注意: 数百KBの一覧ページを `curl` で丸ごとシェル変数に読み込み `printf '%s' "$var" | grep ...` のようにパイプで渡すと、環境（特にサンドボックス化されたシェル）によっては正しく読み取れないことがある。一覧ページは一時ファイルに保存し、`grep`/`awk` にはファイル引数で渡す方式にした方が確実
 - 実装済みの主機能
+  - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成
   - `scripts/build-vbm.sh` で VBM PMTiles 生成
-  - `Justfile` から `setup/inspect/build/validate/clean` 実行可能
+  - `Justfile` から `setup/fetch-vbm/inspect/build/validate/clean` 実行可能
 - VBM のメタ属性付与は、以下に修正済み
   - 誤: `properties.tippecanoe.minzoom`, `properties.tippecanoe.layer`
   - 正: feature 直下の `tippecanoe: { layer, minzoom }`
@@ -120,6 +126,7 @@
 
 - `README.md`
 - `Justfile`
+- `scripts/fetch-vbm.sh`
 - `scripts/build-vbm.sh`
 - `scripts/build-vlcm.sh`
 - `docs/schema.md`
