@@ -46,7 +46,7 @@ brew install gdal tippecanoe jq just
 対象火山の例: 樽前山（たるまえざん）、雌阿寒岳、大雪山、十勝岳、俱多楽、有珠山、北海道駒ヶ岳 ほか
 
 - **VBM（火山基本図）**: https://web1.gsi.go.jp/bousaichiri/vbm-data_hokkai_tohoku.html
-- **VLCM（火山土地条件図）**: https://web2.gsi.go.jp/bousaichiri/volcano-maps-vlcm-data.html
+- **VLCM（火山土地条件図）**: https://www.gsi.go.jp/bousaichiri/bousaichiri41114.html
 
 #### VBM: `just fetch-vbm` で自動取得
 
@@ -60,12 +60,18 @@ just fetch-vbm usu       # src/usu_vbm.zip
 
 `volcano_id` は一覧ページの `<a id="...">` 属性値（ページの HTML ソースで確認できる。例: `tarumae`, `meakan`, `taisetsu`, `tokachi`, `kuttara`, `usu`, `hokaikoma`）。該当する火山がまだ Shapefile 形式で提供されていない、または `volcano_id` が一覧に無い場合はエラーで終了する。
 
-#### VLCM: 現状は手動
+北海道地方で Shapefile が提供されている火山（2026-07-04 時点）: `atosanup`（アトサヌプリ）, `meakan`（雌阿寒岳）, `taisetsu`（大雪山）, `tokachi`（十勝岳）, `tarumae`（樽前山）, `kuttara`（俱多楽）, `usu`（有珠山）, `hokaikoma`（北海道駒ヶ岳）。`esan`（恵山）はまだ Shapefile 未提供（画像データのみ）。
 
-VLCM側は一覧ページの実際のダウンロード導線が未特定のため、当面は以下の手動手順のまま。
+#### VLCM: `just fetch-vlcm` で自動取得
 
-1. Shapefile ZIP をダウンロード
-2. `src/` ディレクトリ直下へ配置（フラット構成、ファイル名は `<volcano_id>_vlcm.zip` を推奨）
+VLCM一覧ページは VBM と違い、火山ごとの `<a id="...">` アンカーを持たない。代わりにダウンロードリンクのファイル名に「2桁の火山コード＋ローマ字3文字」（例: `05trm` = 樽前山）が埋め込まれており、この数字コードは VBM 側（`vbmNN`）と共通である。そのため `scripts/fetch-vlcm.sh` は volcano_id → コードの対応表を内部に持ち、コードでリンクを直接検索する。
+
+```bash
+just fetch-vlcm tarumae   # src/tarumae_vlcm.zip として取得
+just fetch-vlcm usu       # src/usu_vlcm.zip
+```
+
+対応表に無い `volcano_id` を指定するとエラーになる。北海道地方で対応済みの volcano_id（2026-07-04 時点、VBM 側と ID を共通化）: `meakan`, `tokachi`, `tarumae`, `usu`, `hokaikoma`, `esan`。VBM と VLCM で提供状況が異なる点に注意（`atosanup`/`taisetsu`/`kuttara` は VLCM 未提供、逆に `esan` は VBM 未提供だが VLCM は提供されている）。未対応の火山は `scripts/fetch-vlcm.sh` 内の対応表にコードを追加すること。
 
 ### Git 運用メモ（重要）
 
@@ -109,6 +115,7 @@ just clean
 
 - `just setup` — 必須ツール（GDAL/tippecanoe/jq）の有無とバージョン確認
 - `just fetch-vbm <volcano_id>` — GSI の VBM 一覧ページから Shapefile ZIP を取得し `src/` へ配置
+- `just fetch-vlcm <volcano_id>` — GSI の VLCM 一覧ページから Shapefile ZIP を取得し `src/` へ配置
 - `just inspect` — ZIP を展開せずに内容確認（GDAL `/vsizip/`）
 - `just build-vlcm` — `dst/vlcm.pmtiles` を生成
 - `just build-vbm` — `dst/vbm.pmtiles` を生成

@@ -27,14 +27,29 @@
   - `Dockerfile` は削除。`scripts/build-vbm.sh` / `scripts/build-vlcm.sh` / `Justfile` はすべて `docker run` を使わず、PATH 上の `ogr2ogr`/`ogrinfo`/`tippecanoe`/`jq` を直接呼び出す
   - 前提ツールのバージョン固定は brew の formula 任せ（厳密なピン留めは未実装。必要になれば検討）
 - **2026-07-04: `src/` への VBM 入力データ取得を自動化した**
-  - `scripts/fetch-vbm.sh` + `just fetch-vbm <volcano_id>` で、GSI の VBM 一覧ページ（静的HTML、`<a id="...">` アンカー + 直後の `*-shp.zip` 直リンクという構造）から Shapefile ZIP を直接ダウンロードし `src/<volcano_id>_vbm.zip` に配置する
-  - `meakan`（雌阿寒岳）・`usu`（有珠山）で実際に取得 → `build-vbm.sh` まで通ることを確認済み
-  - VLCM側は一覧ページ（`web2.gsi.go.jp/bousaichiri/volcano-maps-vlcm-data.html`）の実際のダウンロード導線が未特定（静的HTMLにリンクが見当たらない）ため、自動化は未着手。手動ダウンロードのまま
+  - `scripts/fetch-vbm.sh` + `just fetch-vbm <volcano_id>` で、GSI の VBM 一覧ページ（`web1.gsi.go.jp/bousaichiri/vbm-data_hokkai_tohoku.html`、静的HTML、`<a id="...">` アンカー + 直後の `*-shp.zip` 直リンクという構造）から Shapefile ZIP を直接ダウンロードし `src/<volcano_id>_vbm.zip` に配置する
+  - `meakan`（雌阿寒岳）・`usu`（有珠山）・`hokaikoma`（北海道駒ヶ岳）で実際に取得 → `build-vbm.sh` まで通ることを確認済み
   - 実装上の注意: 数百KBの一覧ページを `curl` で丸ごとシェル変数に読み込み `printf '%s' "$var" | grep ...` のようにパイプで渡すと、環境（特にサンドボックス化されたシェル）によっては正しく読み取れないことがある。一覧ページは一時ファイルに保存し、`grep`/`awk` にはファイル引数で渡す方式にした方が確実
+- **2026-07-04: `src/` への VLCM 入力データ取得も自動化した**
+  - 正しい一覧ページは `www.gsi.go.jp/bousaichiri/bousaichiri41114.html`（HANDOVER/READMEに以前記載していた `web2.gsi.go.jp/bousaichiri/volcano-maps-vlcm-data.html` は汎用ナビゲーションページで実データなし。ユーザー指摘により判明）
+  - この一覧ページは VBM と構造が異なり、火山ごとの `<a id="...">` アンカーが無い。代わりにダウンロードリンクのファイル名に埋め込まれた「2桁の火山コード＋ローマ字3文字」（例: `05trm`=樽前山）で判別する。この数字コードは VBM 側の `vbmNN` と共通（例: vbm05=樽前山=vlcm05）
+  - `scripts/fetch-vlcm.sh` + `just fetch-vlcm <volcano_id>` を実装。volcano_id → コードの対応表をスクリプト内の `case` 文で保持（bash 3.2 系の macOS 標準シェルは連想配列 `declare -A` 非対応のため、あえて `case` 文にしている）
+  - `tarumae` で取得 → 既存の手動ダウンロード分と **MD5 完全一致** を確認。`usu` でも新規取得 → `build-vlcm.sh` まで通ることを確認済み
+  - VBM と VLCM で提供している火山が完全には一致しないことが判明: `atosanup`/`taisetsu`/`kuttara` は VLCM 未提供、逆に `esan` は VBM 未提供だが VLCM は提供されている（対応表は README 参照）
+- **2026-07-04: `build-vbm.sh`/`build-vlcm.sh` を複数火山対応に一般化した**
+  - 旧実装は `tarumae_vbm.zip`/`tarumae_vlcm.zip` が存在すればそれだけを特別扱いする一時的なテスト用ハードコードが残っていた。`src/*_vbm.zip` / `src/*_vlcm.zip` という命名規約ベースの glob に統一し、`src/` にある全ての実データ ZIP をまとめて処理するようにした（`vbm_test.zip`/`vlcm_test.zip` のような単体テスト用フィクスチャは命名規約が違うため自然に除外される）
+  - tippecanoe のメタデータ名も `Tarumaezan VBM/VLCM` → `Hokkaido VBM/VLCM`（`-N` も `kitavolca-vbm/vlcm`）に変更
+  - `just fetch-vbm usu` で有珠山データを実際に取得し、樽前山と結合してビルド → タイルサイズ警告は変化なし（同じ5タイルのみ、樽前山エリア）。※この結論は後述の8火山結合検証で覆った
+  - 同じ検証で水深系分類コード（7132-7134）の根拠確認も試みたが、有珠山の VBM Shapefile には等高線・等深線系のファイル自体が含まれておらず未解決のまま（詳細は `docs/schema.md`）
+- **2026-07-04: 北海道地方の VBM Shapefile 提供済み全8火山（アトサヌプリ・雌阿寒岳・大雪山・十勝岳・樽前山・俱多楽・有珠山・北海道駒ヶ岳）を結合し再検証**
+  - 549,748 features に到達。**タイルサイズ警告が 5→14 件に増加**（ズーム6・8にも新規発生）。2火山結合時の「悪化しない」という結論は覆った——少数サンプルで一般化しすぎないこと
+  - 対策として `--drop-densest-as-needed` を `build-vbm.sh`/`build-vlcm.sh` の tippecanoe 呼び出しに追加。適用後、**`pmtiles tile <path> <z> <x> <y> | wc -c` で実際のバイト数を直接測定した結果、14候補タイル全てが500,000バイト未満に収まった**（最大 497,051 bytes）
+  - 重要な教訓: `--drop-densest-as-needed` 適用後もビルドログには `tile ... size is ... >500000` という警告行が出続けるが、これは間引き試行中の一時的な超過であり最終成果物の状態を表さない。**ログの警告行数で判断せず、ビルド後に `pmtiles tile` で実測すること**（詳細手順は `docs/zoom-policy.md`）
+  - VBM/VLCM 両方に `--drop-densest-as-needed` を標準設定として適用済み
 - 実装済みの主機能
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
-  - `scripts/build-vlcm.sh` で VLCM PMTiles 生成
-  - `scripts/build-vbm.sh` で VBM PMTiles 生成
+  - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）
+  - `scripts/build-vbm.sh` で VBM PMTiles 生成（`src/*_vbm.zip` を結合処理）
   - `Justfile` から `setup/fetch-vbm/inspect/build/validate/clean` 実行可能
 - VBM のメタ属性付与は、以下に修正済み
   - 誤: `properties.tippecanoe.minzoom`, `properties.tippecanoe.layer`
@@ -127,6 +142,7 @@
 - `README.md`
 - `Justfile`
 - `scripts/fetch-vbm.sh`
+- `scripts/fetch-vlcm.sh`
 - `scripts/build-vbm.sh`
 - `scripts/build-vlcm.sh`
 - `docs/schema.md`

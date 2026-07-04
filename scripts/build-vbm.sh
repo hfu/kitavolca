@@ -10,7 +10,7 @@ INPUT_DIR="${WORKSPACE_DIR}/src"
 WORK_DIR="${WORKSPACE_DIR}/work/vbm"
 OUTPUT_FILE="${WORKSPACE_DIR}/dst/vbm.pmtiles"
 
-echo "=== VBM PMTiles 生成（樽前山テスト）==="
+echo "=== VBM PMTiles 生成 ==="
 echo ""
 
 for cmd in ogr2ogr gdal jq tippecanoe; do
@@ -20,13 +20,9 @@ done
 mkdir -p "$WORK_DIR" "${WORKSPACE_DIR}/dst"
 rm -f "$WORK_DIR"/*.ndjson 2>/dev/null || true
 
-if [ -f "$INPUT_DIR/tarumae_vbm.zip" ]; then
-    vbm_zip_list="$INPUT_DIR/tarumae_vbm.zip"
-else
-    vbm_zip_list="$(ls "$INPUT_DIR"/*.zip 2>/dev/null | grep -Ei 'vbm|base' || true)"
-fi
+vbm_zip_list="$(ls "$INPUT_DIR"/*_vbm.zip 2>/dev/null || true)"
 if [ -z "$vbm_zip_list" ]; then
-    echo "❌ [1. ZIP検出] VBM の ZIP が ${INPUT_DIR} に見つかりません"
+    echo "❌ [1. ZIP検出] VBM の ZIP（*_vbm.zip）が ${INPUT_DIR} に見つかりません"
     exit 1
 fi
 
@@ -113,7 +109,7 @@ fi
 echo ""
 echo "3. PMTiles を生成中..."
 
-if ! tippecanoe --force -P -n "Tarumaezan VBM" -A "GSI" -N "tarumaezan-vbm" --no-progress-indicator -Z 5 -z 14 -o "${WORKSPACE_DIR}/dst/vbm.pmtiles" "$WORK_DIR/vbm_filtered.ndjson"; then
+if ! tippecanoe --force -P -n "Hokkaido VBM" -A "GSI" -N "kitavolca-vbm" --no-progress-indicator --drop-densest-as-needed -Z 5 -z 14 -o "${WORKSPACE_DIR}/dst/vbm.pmtiles" "$WORK_DIR/vbm_filtered.ndjson"; then
     echo "❌ [3. tippecanoe] PMTiles 生成に失敗しました（上記の tippecanoe 出力を確認してください）"
     exit 1
 fi

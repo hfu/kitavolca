@@ -97,6 +97,12 @@ fetch-vbm volcano_id:
     set -e
     bash scripts/fetch-vbm.sh "{{volcano_id}}" "$(pwd)"
 
+# fetch-vlcm: GSI の一覧ページから指定火山の VLCM Shapefile ZIP を取得し src/ へ配置（volcano_id は README 参照）
+fetch-vlcm volcano_id:
+    #!/usr/bin/env bash
+    set -e
+    bash scripts/fetch-vlcm.sh "{{volcano_id}}" "$(pwd)"
+
 # build-vlcm: VLCM から PMTiles を生成
 build-vlcm:
     #!/usr/bin/env bash

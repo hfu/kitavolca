@@ -9,7 +9,7 @@ INPUT_DIR="${WORKSPACE_DIR}/src"
 WORK_DIR="${WORKSPACE_DIR}/work/vlcm"
 OUTPUT_FILE="${WORKSPACE_DIR}/dst/vlcm.pmtiles"
 
-echo "=== VLCM PMTiles 生成（樽前山テスト）==="
+echo "=== VLCM PMTiles 生成 ==="
 echo ""
 
 for cmd in ogr2ogr gdal jq tippecanoe; do
@@ -19,13 +19,9 @@ done
 mkdir -p "$WORK_DIR" "${WORKSPACE_DIR}/dst"
 rm -f "$WORK_DIR"/*.geojson "$WORK_DIR"/*.ndjson 2>/dev/null || true
 
-if [ -f "$INPUT_DIR/tarumae_vlcm.zip" ]; then
-    vlcm_zip_list="$INPUT_DIR/tarumae_vlcm.zip"
-else
-    vlcm_zip_list="$(ls "$INPUT_DIR"/*.zip 2>/dev/null | grep -Ei 'vlcm|land|condition' || true)"
-fi
+vlcm_zip_list="$(ls "$INPUT_DIR"/*_vlcm.zip 2>/dev/null || true)"
 if [ -z "$vlcm_zip_list" ]; then
-    echo "❌ [1. ZIP検出] VLCM の ZIP が ${INPUT_DIR} に見つかりません"
+    echo "❌ [1. ZIP検出] VLCM の ZIP（*_vlcm.zip）が ${INPUT_DIR} に見つかりません"
     exit 1
 fi
 
@@ -98,10 +94,11 @@ echo "2. 抽出結果から PMTiles を生成中..."
 tippecanoe_args=(
     --force
     -P
-    -n "Tarumaezan VLCM"
+    -n "Hokkaido VLCM"
     -A "GSI"
-    -N "tarumaezan-vlcm"
+    -N "kitavolca-vlcm"
     --no-progress-indicator
+    --drop-densest-as-needed
     -Z 5
     -z 14
     -o "${WORKSPACE_DIR}/dst/vlcm.pmtiles"
