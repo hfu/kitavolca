@@ -83,7 +83,21 @@
       "type": "raster",
       "source": "seamlessphoto",
       "paint": {
-        "raster-opacity": 0.25
+        "raster-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0.6,
+          9,
+          0.4,
+          12,
+          0.25
+        ]
       }
     },
     {
