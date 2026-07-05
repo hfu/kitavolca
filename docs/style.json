@@ -37,6 +37,7 @@
       ],
       "encoding": "terrarium",
       "tileSize": 512,
+      "maxzoom": 14,
       "attribution": "<a href='https://mapterhorn.com/attribution'>Mapterhorn</a>"
     }
   },
