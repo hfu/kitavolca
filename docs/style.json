@@ -17552,6 +17552,35 @@
       }
     },
     {
+      "id": "vbm-point-6241-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "6241",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
       "id": "vbm-point-3581",
       "type": "circle",
       "source": "vbm",
@@ -17561,6 +17590,35 @@
         "circle-radius": 4,
         "circle-stroke-color": "#ffffff",
         "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-3581-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "3581",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
       }
     },
     {
@@ -17576,6 +17634,35 @@
       }
     },
     {
+      "id": "vbm-point-3582-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "3582",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
       "id": "vbm-point-6242",
       "type": "circle",
       "source": "vbm",
@@ -17588,6 +17675,35 @@
       }
     },
     {
+      "id": "vbm-point-6242-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "6242",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
       "id": "vbm-point-4257",
       "type": "circle",
       "source": "vbm",
@@ -17597,6 +17713,35 @@
         "circle-radius": 4,
         "circle-stroke-color": "#ffffff",
         "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-4257-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "4257",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
       }
     },
     {
