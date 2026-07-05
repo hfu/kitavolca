@@ -39,6 +39,16 @@
       "tileSize": 512,
       "maxzoom": 14,
       "attribution": "<a href='https://mapterhorn.com/attribution'>Mapterhorn</a>"
+    },
+    "seamlessphoto": {
+      "type": "raster",
+      "tiles": [
+        "https://stars.optgeo.org/seamlessphoto512/{z}/{x}/{y}"
+      ],
+      "tileSize": 512,
+      "minzoom": 1,
+      "maxzoom": 17,
+      "attribution": "国土地理院 シームレス空中写真 (GSI seamlessphoto) CC BY 4.0"
     }
   },
   "layers": [
@@ -57,6 +67,14 @@
           8,
           "rgba(255,255,255,1)"
         ]
+      }
+    },
+    {
+      "id": "seamlessphoto",
+      "type": "raster",
+      "source": "seamlessphoto",
+      "paint": {
+        "raster-opacity": 0.25
       }
     },
     {

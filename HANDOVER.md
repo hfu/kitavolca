@@ -86,6 +86,9 @@
   - ユーザー指摘で判明: Mapterhornのタイルは実際にはズーム14までしか存在しない（z15以降は404）。`sources.mapterhorn`に`maxzoom`を指定していなかったため、MapLibreがz15以降も直接タイルを要求してしまい、404で何も表示されなくなっていた
   - `sources.mapterhorn`に`"maxzoom": 14`を追加。これによりMapLibreはz14のタイルを高ズームでも引き伸ばして使う（オーバーズーム）ようになる
   - Playwrightでネットワークリクエストを直接確認し、z17表示時でも実際にはz13/z14のタイルのみがリクエストされている（404が発生しない）ことを確認済み
+- **2026-07-06: シームレス空中写真（`stars.optgeo.org/seamlessphoto512`）を薄く追加**
+  - `sources.seamlessphoto`（raster, tileSize 512, minzoom 1 / maxzoom 17）を追加し、レイヤーは`background`の直後・`hillshade`より前（最下層）に`raster-opacity: 0.25`で配置。「まずは一番下に薄く」というユーザー指示通り
+  - Playwrightでタイルリクエストが実際に発生している（12件）ことを確認。bvmapの塗りがほぼ不透明なため、上に重なるエリアでは写真は見えにくいが、意図通り最下層としては機能している
 - 実装済みの主機能
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）
