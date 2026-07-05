@@ -12,14 +12,14 @@
     },
     "vbm": {
       "type": "vector",
-      "tiles": ["https://stars.optgeo.org/kitavolca-vbm/{z}/{x}/{y}"],
+      "tiles": ["https://stars.optgeo.org/vbm/{z}/{x}/{y}"],
       "minzoom": 5,
       "maxzoom": 14,
       "attribution": "国土地理院 火山基本図 (VBM)"
     },
     "vlcm": {
       "type": "vector",
-      "tiles": ["https://stars.optgeo.org/kitavolca-vlcm/{z}/{x}/{y}"],
+      "tiles": ["https://stars.optgeo.org/vlcm/{z}/{x}/{y}"],
       "minzoom": 5,
       "maxzoom": 14,
       "attribution": "国土地理院 火山土地条件図 (VLCM)"

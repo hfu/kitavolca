@@ -52,7 +52,8 @@
   - 教訓: タイルサイズ検証では`pmtiles tile | gunzip -c | wc -c`で非圧縮サイズを見ること。圧縮後のバイト数と比較すると実態を見誤る。さらに、`--drop-densest-as-needed`を使わない場合でも、tippecanoeのビルドログが「警告0件」でも実際には超過しているケースがあった（12/3658/1510の例）——**ログを信用せず、必ず実測すること**
 - **2026-07-05: MapLibreプレビューサイト（`docs/index.html` + `docs/style.json`）を追加**
   - ユーザーが生成PMTilesを`stars.optgeo.org`（Martin tileserver）にアップロードする運用のため、それを前提としたプレビューサイトを`docs/`（GitHub Pages公開想定）に構築
-  - 本番タイルURL規約はMartin方式（`https://stars.optgeo.org/kitavolca-vbm|vlcm/{z}/{x}/{y}`、拡張子なし）。ローカル確認は`just serve`（`pmtiles serve dst --port 8080` + `docs/`を`python3 -m http.server 8000`で配信）で、`pmtiles serve`のURL規約（`.mvt`拡張子あり）に切り替わる。**2つのツールでURL形式が違う**ことに注意
+  - 本番タイルURL規約はMartin方式（拡張子なし）。ローカル確認は`just serve`（`pmtiles serve dst --port 8080` + `docs/`を`python3 -m http.server 8000`で配信）で、`pmtiles serve`のURL規約（`.mvt`拡張子あり）に切り替わる。**2つのツールでURL形式が違う**ことに注意
+  - **2026-07-05 追記**: ユーザーが実際に `https://stars.optgeo.org/vbm` と `https://stars.optgeo.org/vlcm` にデプロイ完了（ソース名は `kitavolca-vbm/vlcm` ではなく単に `vbm`/`vlcm`）。`docs/style.json` の本番URLをこれに合わせて修正し、Playwrightで本番環境に対しても表示確認済み（ローカル確認時と同一の見た目で正常表示、コンソールエラーなし）
   - スタイルは`docs/schema.md`で特定した分類コードの実際の意味（道路・建物・等高線・海岸線等）ごとにグルーピング。国土地理院最適化ベクトルタイル（[optimal_bvmap](https://github.com/gsi-cyberjapan/optimal_bvmap)）の実データ（`https://stars.optgeo.org/bvmap` のTileJSON）から実際のレイヤー別minzoom設計（道路z4・建物z14・等高線z9・海岸線z4等）を確認し参考にした
   - Playwright（`npx playwright install chromium`、実行はスクラッチディレクトリで）でヘッドレスブラウザ検証済み: GSI標準地図と重ねた表示、VLCM featureクリックでの属性ポップアップ（`natural`レイヤー、`name=溶岩円頂丘`等）、高ズームでの等高線・建物・道路描画（minzoom=13が正しく機能）を確認。コンソールエラーなし
 - 実装済みの主機能

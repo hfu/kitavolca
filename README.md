@@ -127,7 +127,7 @@ just clean
 
 `docs/index.html` + `docs/style.json` は MapLibre GL JS によるプレビューマップ。GitHub Pages で `docs/` を公開すると、本番タイル（`stars.optgeo.org` の Martin tileserver）を読み込んで表示する。
 
-- 本番: `docs/style.json` の `sources.vbm`/`sources.vlcm` は `https://stars.optgeo.org/kitavolca-vbm|vlcm/{z}/{x}/{y}`（Martin の URL 規約、拡張子なし）
+- 本番: `docs/style.json` の `sources.vbm`/`sources.vlcm` は `https://stars.optgeo.org/vbm|vlcm/{z}/{x}/{y}`（Martin の URL 規約、拡張子なし。ソース名は stars.optgeo.org 側のデプロイ設定に依存するため、変更された場合は `docs/style.json` を追従させること）
 - ローカル確認: `just serve` 実行後に `?source=local` を付けてアクセスすると、`pmtiles serve dst --port 8080` が配信する `http://localhost:8080/vbm|vlcm/{z}/{x}/{y}.mvt`（`pmtiles serve` の URL 規約、`.mvt` 拡張子あり。Martin とは形式が異なるので注意）に切り替わる
 - 地図クリックで、その地点の feature 属性（`分類コード`・`tippecanoe.layer` 等）をポップアップ表示
 
