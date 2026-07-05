@@ -98,7 +98,6 @@ tippecanoe_args=(
     -A "GSI"
     -N "kitavolca-vlcm"
     --no-progress-indicator
-    --drop-densest-as-needed
     -Z 5
     -z 14
     -o "${WORKSPACE_DIR}/dst/vlcm.pmtiles"
