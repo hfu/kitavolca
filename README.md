@@ -121,6 +121,15 @@ just clean
 - `just build-vbm` — `dst/vbm.pmtiles` を生成
 - `just validate` — PMTiles出力の存在・可読性、中間データの属性整合性（ID番号削除・tippecanoe.layer/minzoom付与・想定外属性なし）を機械検証（異常時は exit code 1）
 - `just clean` — 生成物と中間ファイルを削除
+- `just serve` — `docs/` のプレビューサイトと、ローカル `dst/*.pmtiles`（`pmtiles serve`）を同時に起動。`http://localhost:8000/?source=local` で確認
+
+## プレビューサイト（`docs/`）
+
+`docs/index.html` + `docs/style.json` は MapLibre GL JS によるプレビューマップ。GitHub Pages で `docs/` を公開すると、本番タイル（`stars.optgeo.org` の Martin tileserver）を読み込んで表示する。
+
+- 本番: `docs/style.json` の `sources.vbm`/`sources.vlcm` は `https://stars.optgeo.org/kitavolca-vbm|vlcm/{z}/{x}/{y}`（Martin の URL 規約、拡張子なし）
+- ローカル確認: `just serve` 実行後に `?source=local` を付けてアクセスすると、`pmtiles serve dst --port 8080` が配信する `http://localhost:8080/vbm|vlcm/{z}/{x}/{y}.mvt`（`pmtiles serve` の URL 規約、`.mvt` 拡張子あり。Martin とは形式が異なるので注意）に切り替わる
+- 地図クリックで、その地点の feature 属性（`分類コード`・`tippecanoe.layer` 等）をポップアップ表示
 
 ## レイヤ設計（MapLibre 向け）
 
@@ -134,6 +143,7 @@ just clean
 
 - **source**: `vbm`
 - **source-layers**: `分類コード` ごとに1レイヤ（例: `7102`, `3001`, `2101` ...）。feature 直下の `tippecanoe.layer` に分類コードを文字列化して設定し、tippecanoe が自動的にレイヤ分割する
+- `docs/style.json` が各分類コードを実際の意味（道路・建物・等高線等、`docs/schema.md` 参照）ごとにグルーピングしてスタイリングしている
 
 ## Schema / Zoom 方針
 

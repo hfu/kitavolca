@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>kitavolca プレビュー — 北海道火山図 VBM/VLCM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+  #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  #panel {
+    position: absolute; top: 10px; left: 10px; z-index: 1;
+    background: rgba(255,255,255,0.92); border-radius: 6px; padding: 10px 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3); max-width: 320px; font-size: 13px; line-height: 1.5;
+  }
+  #panel h1 { font-size: 14px; margin: 0 0 6px; }
+  #panel code { background: #eee; padding: 1px 4px; border-radius: 3px; }
+  #panel a { color: #2a6ebb; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <h1>kitavolca プレビュー</h1>
+  <div id="mode"></div>
+  <div>データ: 国土地理院 VBM/VLCM（<a href="https://github.com/hfu/kitavolca" target="_blank">kitavolca</a>）</div>
+  <div>ローカルの <code>dst/*.pmtiles</code> で確認する場合は、まず
+    <code>just serve</code> を実行してから
+    <a href="?source=local">?source=local</a> を付けてアクセス。</div>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const useLocal = params.get('source') === 'local';
+// `just serve` runs `pmtiles serve dst --port 8080`, which uses a
+// {z}/{x}/{y}.mvt URL convention (different from Martin's extension-less
+// URLs on stars.optgeo.org production).
+const LOCAL_TILE_PORT = 8080;
+
+document.getElementById('mode').textContent = useLocal
+  ? `モード: ローカル (pmtiles serve, port ${LOCAL_TILE_PORT})`
+  : 'モード: 本番 (stars.optgeo.org)';
+
+fetch('style.json')
+  .then(r => r.json())
+  .then(style => {
+    if (useLocal) {
+      style.sources.vbm.tiles = [`http://localhost:${LOCAL_TILE_PORT}/vbm/{z}/{x}/{y}.mvt`];
+      style.sources.vlcm.tiles = [`http://localhost:${LOCAL_TILE_PORT}/vlcm/{z}/{x}/{y}.mvt`];
+    }
+    const map = new maplibregl.Map({
+      container: 'map',
+      style,
+      center: [141.38, 42.69], // 樽前山
+      zoom: 11
+    });
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+
+    map.on('click', (e) => {
+      const features = map.queryRenderedFeatures(e.point);
+      if (!features.length) return;
+      const rows = features.slice(0, 8).map(f =>
+        `<tr><td><code>${f.layer['source-layer'] || f.layer.id}</code></td><td>${
+          Object.entries(f.properties).map(([k, v]) => `${k}=${v}`).join(', ')
+        }</td></tr>`
+      ).join('');
+      new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(`<table style="font-size:12px">${rows}</table>`)
+        .addTo(map);
+    });
+  })
+  .catch(err => {
+    document.getElementById('panel').innerHTML +=
+      `<div style="color:#b00">style.json の読み込みに失敗: ${err}</div>`;
+  });
+</script>
+</body>
+</html>

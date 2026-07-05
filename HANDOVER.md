@@ -50,11 +50,17 @@
   - **同日中に正体を特定・解決**: 樽前山のシェープファイルを1つずつ変換して確認した結果、`2101/2103/2106/2107`=**道路**、`5101/5102/5106`=**水涯線・海岸線**と判明（`3001`等=建物も含め、由来ファイル名との対応表を`docs/schema.md`に整理）。ユーザー指示で[国土地理院最適化ベクトルタイル](https://github.com/gsi-cyberjapan/optimal_bvmap)の設計を参考にしつつ（建物の面積間引きのような作り込みはしない方針）、道路・建物にも同じ単純な`minzoom`シフトを適用。最終的に等高線・道路・建物の計16コードを**minzoom=13**に統一（12では樽前山火口周辺の1タイルのみ非圧縮556KBで超過が残ったため、13まで追加シフト）。海岸線はGSIの設計に倣い意図的に制限しないまま
   - 最終確認: 北海道8火山結合データ・過去に警告が出た全13候補タイルを`pmtiles tile | gunzip -c | wc -c`で実測し、**全て500KB未満（最大472,270 bytes）を確認**。データ間引きは一切無し（549,748 features のまま不変）。VBM PMTilesは59MB（低ズームでの重複描画が減り80-96MBから縮小）
   - 教訓: タイルサイズ検証では`pmtiles tile | gunzip -c | wc -c`で非圧縮サイズを見ること。圧縮後のバイト数と比較すると実態を見誤る。さらに、`--drop-densest-as-needed`を使わない場合でも、tippecanoeのビルドログが「警告0件」でも実際には超過しているケースがあった（12/3658/1510の例）——**ログを信用せず、必ず実測すること**
+- **2026-07-05: MapLibreプレビューサイト（`docs/index.html` + `docs/style.json`）を追加**
+  - ユーザーが生成PMTilesを`stars.optgeo.org`（Martin tileserver）にアップロードする運用のため、それを前提としたプレビューサイトを`docs/`（GitHub Pages公開想定）に構築
+  - 本番タイルURL規約はMartin方式（`https://stars.optgeo.org/kitavolca-vbm|vlcm/{z}/{x}/{y}`、拡張子なし）。ローカル確認は`just serve`（`pmtiles serve dst --port 8080` + `docs/`を`python3 -m http.server 8000`で配信）で、`pmtiles serve`のURL規約（`.mvt`拡張子あり）に切り替わる。**2つのツールでURL形式が違う**ことに注意
+  - スタイルは`docs/schema.md`で特定した分類コードの実際の意味（道路・建物・等高線・海岸線等）ごとにグルーピング。国土地理院最適化ベクトルタイル（[optimal_bvmap](https://github.com/gsi-cyberjapan/optimal_bvmap)）の実データ（`https://stars.optgeo.org/bvmap` のTileJSON）から実際のレイヤー別minzoom設計（道路z4・建物z14・等高線z9・海岸線z4等）を確認し参考にした
+  - Playwright（`npx playwright install chromium`、実行はスクラッチディレクトリで）でヘッドレスブラウザ検証済み: GSI標準地図と重ねた表示、VLCM featureクリックでの属性ポップアップ（`natural`レイヤー、`name=溶岩円頂丘`等）、高ズームでの等高線・建物・道路描画（minzoom=13が正しく機能）を確認。コンソールエラーなし
 - 実装済みの主機能
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）
   - `scripts/build-vbm.sh` で VBM PMTiles 生成（`src/*_vbm.zip` を結合処理）
-  - `Justfile` から `setup/fetch-vbm/inspect/build/validate/clean` 実行可能
+  - `docs/index.html`/`docs/style.json` で MapLibre プレビュー（本番/ローカル両対応）
+  - `Justfile` から `setup/fetch-vbm/fetch-vlcm/inspect/build/validate/serve/clean` 実行可能
 - VBM のメタ属性付与は、以下に修正済み
   - 誤: `properties.tippecanoe.minzoom`, `properties.tippecanoe.layer`
   - 正: feature 直下の `tippecanoe: { layer, minzoom }`
@@ -151,6 +157,7 @@
 - `scripts/build-vlcm.sh`
 - `docs/schema.md`
 - `docs/zoom-policy.md`
+- `docs/index.html`, `docs/style.json`（MapLibre プレビューサイト）
 
 ---
 

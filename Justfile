@@ -213,5 +213,21 @@ clean:
     
     # そのほか中間ファイル
     rm -f *.geojson *.ndjson 2>/dev/null || true
-    
+
     echo "✓ クリーンアップ完了"
+
+# serve: docs/ のプレビューサイトとローカル dst/*.pmtiles を配信（ローカル動作確認用）
+serve:
+    #!/usr/bin/env bash
+    set -e
+    for pmtiles in dst/vbm.pmtiles dst/vlcm.pmtiles; do
+        [ -f "$pmtiles" ] || { echo "❌ $pmtiles が見つかりません。先に 'just build-vbm'/'just build-vlcm' を実行してください"; exit 1; }
+    done
+    echo "=== ローカルプレビュー起動 ==="
+    echo "  サイト:   http://localhost:8000/?source=local"
+    echo "  タイル:   http://localhost:8080/ (pmtiles serve, Ctrl+C で両方停止)"
+    echo ""
+    pmtiles serve dst --port 8080 --cors "*" &
+    TILE_PID=$!
+    trap 'kill "$TILE_PID" 2>/dev/null' EXIT
+    (cd docs && python3 -m http.server 8000)
