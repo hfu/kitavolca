@@ -647,6 +647,19 @@
       }
     },
     {
+      "id": "vlcm-natural-point",
+      "type": "circle",
+      "source": "vlcm",
+      "source-layer": "natural",
+      "filter": ["==", ["geometry-type"], "Point"],
+      "paint": {
+        "circle-color": "rgb(200,60,50)",
+        "circle-radius": 3,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
       "id": "vlcm-artificial-fill",
       "type": "fill",
       "source": "vlcm",
