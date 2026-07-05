@@ -180,6 +180,11 @@ jq -r 'select(.properties["分類コード"]==<code>) | .properties["標高"]' w
 
 今後別の火山を追加した際、樽前山の凡例に無い `name` が出てきたら、その火山自身の公式凡例画像（`disaportal.gsi.go.jp` のページから辿れる）を確認し、実測値で `docs/style.json` の `NAME_COLORS` 相当のテーブルを更新すること。
 
+**2026-07-05 追記（ポリゴン境界線の低ズーム対策）**: 実データで確認したところ、`名称="火口"` は（他の火口跡・階段状地形等と違い）実際には Polygon ジオメトリだった。低ズームでは1,500件超のPolygon境界線が重なって黒く潰れて見える問題があったため、`vlcm-natural-line` を3レイヤーに分割した:
+- `vlcm-natural-crater-outline`: `火口`（Polygon）専用、赤線、ズーム制限なし
+- `vlcm-natural-boundary`: その他の Polygon 境界線、`minzoom: 11`（低ズームでは非表示にして黒つぶれを回避）
+- `vlcm-natural-symbol-line`: 実際に LineString 型の地形記号（火口跡・階段状地形・断層等）、赤/黒線、ズーム制限なし
+
 ## Refinement Process（今後の火山データ追加時）
 
 1. 新しい火山の ZIP を `src/` に配置し `just inspect` で概要確認

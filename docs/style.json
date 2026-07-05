@@ -579,10 +579,34 @@
       }
     },
     {
-      "id": "vlcm-natural-line",
+      "id": "vlcm-natural-crater-outline",
       "type": "line",
       "source": "vlcm",
       "source-layer": "natural",
+      "filter": ["all", ["==", ["geometry-type"], "Polygon"], ["==", ["get", "name"], "火口"]],
+      "paint": {
+        "line-color": "rgb(200,60,50)",
+        "line-width": 1.6
+      }
+    },
+    {
+      "id": "vlcm-natural-boundary",
+      "type": "line",
+      "source": "vlcm",
+      "source-layer": "natural",
+      "filter": ["all", ["==", ["geometry-type"], "Polygon"], ["!=", ["get", "name"], "火口"]],
+      "minzoom": 11,
+      "paint": {
+        "line-color": "rgba(0,0,0,0.4)",
+        "line-width": 0.6
+      }
+    },
+    {
+      "id": "vlcm-natural-symbol-line",
+      "type": "line",
+      "source": "vlcm",
+      "source-layer": "natural",
+      "filter": ["==", ["geometry-type"], "LineString"],
       "paint": {
         "line-color": [
           "match",
@@ -637,6 +661,7 @@
       "type": "line",
       "source": "vlcm",
       "source-layer": "artificial",
+      "minzoom": 11,
       "paint": {
         "line-color": "rgb(200,60,50)",
         "line-width": 0.8
