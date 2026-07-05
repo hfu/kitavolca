@@ -63,6 +63,12 @@
   - `https://tiles.mapterhorn.com/tilejson.json`（terrarium encoding, webp, tileSize 512）を`raster-dem`ソースとして追加し、`terrain`と`hillshade`の両方に使用。3D地形表示が有効（`pitch: 50`をデフォルトに設定、`TerrainControl`でON/OFF可能）
   - レイヤ順序をユーザー指示通りに構成: 背景 → hillshade → bvmap塗り面(fill, 11層) → **VLCM**(4層) → bvmap線(line, 99層) → bvmapラベル(symbol, 12層) → **VBM**(61層、最前面)。bvmapの元レイヤーは全て `bvmap-` プレフィックスを付け、`source`を`v`→`bvmap`に付け替え
   - スタイル統合はPythonスクリプトで実施（189レイヤーを手作業で並べるのは非現実的なため）。マージ後のJSON妥当性・レイヤー順序をjqで確認し、Playwrightで実際に3Dレンダリング・モノトーン配色・ラベル表示を検証（コンソールエラーなし、hillshadeとterrainで同一ソース共有の警告のみ＝実害なし）
+- **2026-07-05: VLCMの配色をGSI公式凡例に基づいて実装**
+  - `disaportal.gsi.go.jp`の凡例ページから樽前山の凡例画像（JPEG）を取得し、Pillowでスウォッチのピクセルを実測してRGB値を抽出
+  - **重要な発見**: 色は`code2`/`code3`単位ではなく`name`（地形名）単位で個別に割り当てられている（同じcode3でも名称ごとに全く違う色）。そのため`docs/style.json`は`name`に対する`match`式で配色（火口・火口跡等ライン記号のみの項目は`fill-opacity:0`+赤線で再現）
+  - 有珠山データで樽前山の凡例に無い名称が多数あることを確認（噴火年ラベル等は火山固有）。未知の名称は樽前山凡例からの類推色、さらに未知なら`code2`ベースのフォールバック色を用意
+  - Playwrightで3D地形上にVLCM色分けが正しく重なることを確認
+  - ユーザー指示でプレビューパネルの説明文を削除し、地図表示エリアを最大化
 - 実装済みの主機能
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）
