@@ -70,6 +70,15 @@
       }
     },
     {
+      "id": "bvmap-行政区画",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "AdmArea",
+      "paint": {
+        "fill-color": "rgba(255,255,255,1)"
+      }
+    },
+    {
       "id": "seamlessphoto",
       "type": "raster",
       "source": "seamlessphoto",
@@ -86,15 +95,6 @@
         "hillshade-shadow-color": "rgba(60,60,60,1)",
         "hillshade-highlight-color": "rgba(255,255,255,1)",
         "hillshade-accent-color": "rgba(90,90,90,1)"
-      }
-    },
-    {
-      "id": "bvmap-行政区画",
-      "type": "fill",
-      "source": "bvmap",
-      "source-layer": "AdmArea",
-      "paint": {
-        "fill-color": "rgba(255,255,255,1)"
       }
     },
     {
@@ -223,6 +223,334 @@
       }
     },
     {
+      "id": "bvmap-海岸線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "Cstline",
+      "filter": [
+        "in",
+        [
+          "get",
+          "vt_code"
+        ],
+        [
+          "literal",
+          [
+            5101,
+            5103
+          ]
+        ]
+      ],
+      "paint": {
+        "line-color": [
+          "step",
+          [
+            "zoom"
+          ],
+          "rgb(130,130,130)",
+          8,
+          [
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            [
+              5103
+            ],
+            "rgba(100,100,100,1)",
+            "rgba(88,88,88,1)"
+          ]
+        ],
+        "line-offset": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          [
+            5103
+          ],
+          -1,
+          0
+        ],
+        "line-width": 1
+      }
+    },
+    {
+      "id": "bvmap-河川中心線人工水路地下",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "RvrCL",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        5322
+      ],
+      "paint": {
+        "line-color": [
+          "step",
+          [
+            "zoom"
+          ],
+          "rgba(209,209,209,1)",
+          16,
+          "rgba(88,88,88,1)"
+        ],
+        "line-dasharray": [
+          5,
+          10
+        ],
+        "line-width": 1,
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          0,
+          14,
+          1
+        ]
+      }
+    },
+    {
+      "id": "bvmap-河川中心線枯れ川部",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "RvrCL",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        5302
+      ],
+      "paint": {
+        "line-color": [
+          "step",
+          [
+            "zoom"
+          ],
+          "rgba(209,209,209,1)",
+          16,
+          "rgba(88,88,88,1)"
+        ],
+        "line-dasharray": [
+          10,
+          5
+        ],
+        "line-width": 1,
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          0,
+          14,
+          1
+        ]
+      }
+    },
+    {
+      "id": "bvmap-河川中心線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "RvrCL",
+      "filter": [
+        "!",
+        [
+          "in",
+          [
+            "get",
+            "vt_code"
+          ],
+          [
+            "literal",
+            [
+              5302,
+              5322
+            ]
+          ]
+        ]
+      ],
+      "paint": {
+        "line-color": [
+          "step",
+          [
+            "zoom"
+          ],
+          [
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            5321,
+            "rgba(100,100,100,1)",
+            "rgba(209,209,209,1)"
+          ],
+          16,
+          [
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            5321,
+            "rgba(100,100,100,1)",
+            "rgba(88,88,88,1)"
+          ]
+        ],
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          15,
+          [
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            5321,
+            0.5,
+            1
+          ],
+          16,
+          [
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            5321,
+            2,
+            1
+          ]
+        ],
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          0,
+          14,
+          1
+        ]
+      }
+    },
+    {
+      "id": "bvmap-海岸線堤防等に接する部分破線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "Cstline",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        5103
+      ],
+      "layout": {
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "rgba(100,100,100,1)",
+        "line-width": 1.5,
+        "line-dasharray": [
+          0.2,
+          4
+        ]
+      }
+    },
+    {
+      "id": "bvmap-水涯線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "WL",
+      "paint": {
+        "line-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          [
+            5203,
+            5233
+          ],
+          "rgba(100,100,100,1)",
+          "rgba(88,88,88,1)"
+        ],
+        "line-offset": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          [
+            5203,
+            5233
+          ],
+          -1,
+          0
+        ],
+        "line-width": 1
+      }
+    },
+    {
+      "id": "bvmap-水涯線堤防等に接する部分破線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "WL",
+      "filter": [
+        "in",
+        [
+          "get",
+          "vt_code"
+        ],
+        [
+          "literal",
+          [
+            5203,
+            5233
+          ]
+        ]
+      ],
+      "layout": {
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "rgba(100,100,100,1)",
+        "line-width": 1.5,
+        "line-dasharray": [
+          0.2,
+          4
+        ]
+      }
+    },
+    {
       "id": "bvmap-水部表記線polygon",
       "type": "fill",
       "source": "bvmap",
@@ -237,6 +565,384 @@
       "paint": {
         "fill-color": "rgba(255,255,255,1)",
         "fill-outline-color": "rgba(100,100,100,1)"
+      }
+    },
+    {
+      "id": "bvmap-水部表記線line",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "WRltLine",
+      "filter": [
+        "==",
+        [
+          "geometry-type"
+        ],
+        "LineString"
+      ],
+      "paint": {
+        "line-color": "rgba(99,99,99,1)",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "bvmap-行政区画界線25000所属界（所属を明示する境界線）",
+      "minzoom": 11,
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "AdmBdry",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        1221
+      ],
+      "layout": {
+        "line-cap": "square"
+      },
+      "paint": {
+        "line-color": "rgba(35,35,35,1)",
+        "line-dasharray": [
+          4,
+          1,
+          1,
+          5
+        ],
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0,
+          6,
+          1
+        ],
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "bvmap-行政区画界線25000市区町村界",
+      "minzoom": 11,
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "AdmBdry",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        1212
+      ],
+      "layout": {
+        "line-cap": "square"
+      },
+      "paint": {
+        "line-color": "rgba(35,35,35,1)",
+        "line-dasharray": [
+          6,
+          2,
+          1,
+          2,
+          1,
+          2
+        ],
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0,
+          6,
+          1
+        ],
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "bvmap-行政区画界線25000都府県界及び北海道総合振興局・振興局界",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "AdmBdry",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        1211
+      ],
+      "layout": {
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "rgba(35,35,35,1)",
+        "line-dasharray": [
+          7,
+          5,
+          0.1,
+          5
+        ],
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0,
+          6,
+          1
+        ],
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          1,
+          9,
+          2.5
+        ]
+      }
+    },
+    {
+      "id": "bvmap-行政区画界線地方界",
+      "maxzoom": 8,
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "AdmBdry",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        1212
+      ],
+      "layout": {
+        "line-cap": "square"
+      },
+      "paint": {
+        "line-color": "rgba(35,35,35,1)",
+        "line-dasharray": [
+          7,
+          5,
+          0.1,
+          5
+        ],
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          5,
+          0,
+          6,
+          1
+        ],
+        "line-width": 1
+      }
+    },
+    {
+      "id": "bvmap-行政区画界線国の所属界",
+      "maxzoom": 8,
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "AdmBdry",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_code"
+        ],
+        1221
+      ],
+      "layout": {
+        "line-cap": "square"
+      },
+      "paint": {
+        "line-color": "rgba(27,27,27,1)",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "bvmap-等高線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "Cntr",
+      "paint": {
+        "line-color": "rgb(161,161,161)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          9,
+          0.7,
+          12,
+          0.7,
+          13,
+          [
+            "case",
+            [
+              "==",
+              [
+                "%",
+                [
+                  "get",
+                  "vt_alti"
+                ],
+                50
+              ],
+              0
+            ],
+            1.4,
+            0.7
+          ]
+        ],
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          9,
+          0,
+          10,
+          [
+            "case",
+            [
+              "==",
+              [
+                "%",
+                [
+                  "get",
+                  "vt_alti"
+                ],
+                50
+              ],
+              0
+            ],
+            1,
+            0
+          ],
+          14,
+          [
+            "case",
+            [
+              "==",
+              [
+                "%",
+                [
+                  "get",
+                  "vt_alti"
+                ],
+                50
+              ],
+              0
+            ],
+            1,
+            0
+          ],
+          15,
+          1,
+          16,
+          [
+            "case",
+            [
+              "==",
+              [
+                "get",
+                "vt_code"
+              ],
+              7353
+            ],
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": "bvmap-等深線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "Isbt",
+      "paint": {
+        "line-color": "rgb(88,88,88)",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "bvmap-地形表記線",
+      "type": "line",
+      "source": "bvmap",
+      "source-layer": "TpgphLine",
+      "paint": {
+        "line-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          [
+            7571,
+            7572
+          ],
+          "rgba(88,88,88,1)",
+          "rgb(161,161,161)"
+        ],
+        "line-width": 1,
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          14,
+          0,
+          15,
+          [
+            "case",
+            [
+              "==",
+              [
+                "get",
+                "vt_code"
+              ],
+              7509
+            ],
+            0,
+            1
+          ],
+          16,
+          1
+        ]
       }
     },
     {
@@ -260,192 +966,132 @@
       }
     },
     {
-      "id": "bvmap-建築物0",
-      "type": "fill",
+      "id": "bvmap-水部構造物線",
+      "type": "line",
       "source": "bvmap",
-      "source-layer": "BldA",
+      "source-layer": "WStrL",
       "filter": [
-        "==",
+        "step",
         [
-          "get",
-          "vt_lvorder"
+          "zoom"
         ],
-        0
+        [
+          "any",
+          [
+            "!",
+            [
+              "has",
+              "vt_flag17"
+            ]
+          ],
+          [
+            "in",
+            [
+              "get",
+              "vt_flag17"
+            ],
+            [
+              "literal",
+              [
+                0,
+                1
+              ]
+            ]
+          ]
+        ],
+        17,
+        [
+          "in",
+          [
+            "get",
+            "vt_flag17"
+          ],
+          [
+            "literal",
+            [
+              1,
+              2
+            ]
+          ]
+        ]
       ],
       "paint": {
-        "fill-color": [
+        "line-color": [
           "match",
           [
             "get",
             "vt_code"
           ],
-          3101,
-          "rgba(233,233,233,1)",
-          3102,
-          "rgba(203,203,203,1)",
-          3103,
-          "rgba(152,152,152,1)",
-          3111,
-          "rgba(203,203,203,1)",
-          3112,
-          "rgba(203,203,203,1)",
-          "rgba(0,0,0,0)"
-        ]
-      }
-    },
-    {
-      "id": "bvmap-建築物1",
-      "type": "fill",
-      "source": "bvmap",
-      "source-layer": "BldA",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_lvorder"
+          5521,
+          "rgba(88,88,88,1)",
+          "rgba(100,100,100,1)"
         ],
-        1
-      ],
-      "paint": {
-        "fill-color": [
+        "line-gap-width": [
           "match",
           [
             "get",
             "vt_code"
           ],
-          3101,
-          "rgba(233,233,233,1)",
-          3102,
-          "rgba(203,203,203,1)",
-          3103,
-          "rgba(152,152,152,1)",
-          3111,
-          "rgba(203,203,203,1)",
-          3112,
-          "rgba(203,203,203,1)",
-          "rgba(0,0,0,0)"
-        ]
-      }
-    },
-    {
-      "id": "bvmap-建築物2",
-      "type": "fill",
-      "source": "bvmap",
-      "source-layer": "BldA",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_lvorder"
+          5514,
+          3,
+          0
         ],
-        2
-      ],
-      "paint": {
-        "fill-color": [
+        "line-opacity": [
           "match",
           [
             "get",
             "vt_code"
           ],
-          3101,
-          "rgba(233,233,233,1)",
-          3102,
-          "rgba(203,203,203,1)",
-          3103,
-          "rgba(152,152,152,1)",
-          3111,
-          "rgba(203,203,203,1)",
-          3112,
-          "rgba(203,203,203,1)",
-          "rgba(0,0,0,0)"
-        ]
-      }
-    },
-    {
-      "id": "bvmap-建築物3",
-      "type": "fill",
-      "source": "bvmap",
-      "source-layer": "BldA",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_lvorder"
+          5532,
+          0.5,
+          1
         ],
-        3
-      ],
-      "paint": {
-        "fill-color": [
-          "match",
+        "line-width": [
+          "step",
           [
-            "get",
-            "vt_code"
+            "zoom"
           ],
-          3101,
-          "rgba(233,233,233,1)",
-          3102,
-          "rgba(203,203,203,1)",
-          3103,
-          "rgba(152,152,152,1)",
-          3111,
-          "rgba(203,203,203,1)",
-          3112,
-          "rgba(203,203,203,1)",
-          "rgba(0,0,0,0)"
-        ]
-      }
-    },
-    {
-      "id": "bvmap-建築物4",
-      "type": "fill",
-      "source": "bvmap",
-      "source-layer": "BldA",
-      "filter": [
-        ">=",
-        [
-          "get",
-          "vt_lvorder"
-        ],
-        4
-      ],
-      "paint": {
-        "fill-color": [
-          "match",
           [
-            "get",
-            "vt_code"
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            5501,
+            1,
+            5511,
+            2,
+            5514,
+            1,
+            5515,
+            3.5,
+            5521,
+            2,
+            5532,
+            1,
+            0
           ],
-          3101,
-          "rgba(233,233,233,1)",
-          3102,
-          "rgba(203,203,203,1)",
-          3103,
-          "rgba(152,152,152,1)",
-          3111,
-          "rgba(203,203,203,1)",
-          3112,
-          "rgba(203,203,203,1)",
-          "rgba(0,0,0,0)"
-        ]
-      }
-    },
-    {
-      "id": "bvmap-構造物面",
-      "type": "fill",
-      "source": "bvmap",
-      "source-layer": "StrctArea",
-      "paint": {
-        "fill-color": [
-          "match",
+          17,
           [
-            "get",
-            "vt_code"
-          ],
-          4301,
-          "rgba(152,152,152,1)",
-          4302,
-          "rgba(233,233,233,1)",
-          "rgba(0,0,0,0)"
+            "match",
+            [
+              "get",
+              "vt_code"
+            ],
+            5501,
+            1,
+            5511,
+            2,
+            5514,
+            1,
+            5515,
+            1,
+            5521,
+            2,
+            5532,
+            1,
+            0
+          ]
         ]
       }
     },
@@ -978,839 +1624,812 @@
       }
     },
     {
-      "id": "bvmap-海岸線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "Cstline",
-      "filter": [
-        "in",
-        [
-          "get",
-          "vt_code"
-        ],
-        [
-          "literal",
-          [
-            5101,
-            5103
-          ]
-        ]
-      ],
+      "id": "vbm-water-area",
+      "type": "fill",
+      "source": "vbm",
+      "source-layer": "5112",
       "paint": {
-        "line-color": [
-          "step",
-          [
-            "zoom"
-          ],
-          "rgb(130,130,130)",
-          8,
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            [
-              5103
-            ],
-            "rgba(100,100,100,1)",
-            "rgba(88,88,88,1)"
-          ]
-        ],
-        "line-offset": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          [
-            5103
-          ],
-          -1,
-          0
-        ],
+        "fill-color": "#a6cbe8",
+        "fill-opacity": 0.6
+      }
+    },
+    {
+      "id": "vbm-building-3001",
+      "type": "fill",
+      "source": "vbm",
+      "source-layer": "3001",
+      "minzoom": 13,
+      "paint": {
+        "fill-color": "#c9a98c",
+        "fill-opacity": 0.7
+      }
+    },
+    {
+      "id": "vbm-building-3002",
+      "type": "fill",
+      "source": "vbm",
+      "source-layer": "3002",
+      "minzoom": 13,
+      "paint": {
+        "fill-color": "#c9a98c",
+        "fill-opacity": 0.7
+      }
+    },
+    {
+      "id": "vbm-building-3003",
+      "type": "fill",
+      "source": "vbm",
+      "source-layer": "3003",
+      "minzoom": 13,
+      "paint": {
+        "fill-color": "#c9a98c",
+        "fill-opacity": 0.7
+      }
+    },
+    {
+      "id": "vbm-building-3004",
+      "type": "fill",
+      "source": "vbm",
+      "source-layer": "3004",
+      "minzoom": 13,
+      "paint": {
+        "fill-color": "#c9a98c",
+        "fill-opacity": 0.7
+      }
+    },
+    {
+      "id": "vbm-water-edge-5101",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5101",
+      "paint": {
+        "line-color": "#3b7bb5",
+        "line-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-water-edge-5102",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5102",
+      "paint": {
+        "line-color": "#3b7bb5",
+        "line-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-water-edge-5106",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5106",
+      "paint": {
+        "line-color": "#3b7bb5",
+        "line-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-water-structure-5202",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5202",
+      "paint": {
+        "line-color": "#4a90c4",
         "line-width": 1
       }
     },
     {
-      "id": "bvmap-河川中心線人工水路地下",
+      "id": "vbm-water-structure-5211",
       "type": "line",
-      "source": "bvmap",
-      "source-layer": "RvrCL",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        5322
-      ],
+      "source": "vbm",
+      "source-layer": "5211",
       "paint": {
-        "line-color": [
-          "step",
-          [
-            "zoom"
-          ],
-          "rgba(209,209,209,1)",
-          16,
-          "rgba(88,88,88,1)"
-        ],
-        "line-dasharray": [
-          5,
-          10
-        ],
+        "line-color": "#4a90c4",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "vbm-water-structure-5226",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5226",
+      "paint": {
+        "line-color": "#4a90c4",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "vbm-water-structure-5227",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5227",
+      "paint": {
+        "line-color": "#4a90c4",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "vbm-water-structure-5228",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5228",
+      "paint": {
+        "line-color": "#4a90c4",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "vbm-water-structure-5232",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5232",
+      "paint": {
+        "line-color": "#4a90c4",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "vbm-water-structure-5239",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5239",
+      "paint": {
+        "line-color": "#4a90c4",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "vbm-sabo-5265",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "5265",
+      "paint": {
+        "line-color": "#7a5230",
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "vbm-admin-1102",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "1102",
+      "paint": {
+        "line-color": "#9b59b6",
         "line-width": 1,
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          10,
-          0,
-          14,
-          1
-        ]
-      }
-    },
-    {
-      "id": "bvmap-河川中心線枯れ川部",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "RvrCL",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        5302
-      ],
-      "paint": {
-        "line-color": [
-          "step",
-          [
-            "zoom"
-          ],
-          "rgba(209,209,209,1)",
-          16,
-          "rgba(88,88,88,1)"
-        ],
-        "line-dasharray": [
-          10,
-          5
-        ],
-        "line-width": 1,
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          10,
-          0,
-          14,
-          1
-        ]
-      }
-    },
-    {
-      "id": "bvmap-河川中心線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "RvrCL",
-      "filter": [
-        "!",
-        [
-          "in",
-          [
-            "get",
-            "vt_code"
-          ],
-          [
-            "literal",
-            [
-              5302,
-              5322
-            ]
-          ]
-        ]
-      ],
-      "paint": {
-        "line-color": [
-          "step",
-          [
-            "zoom"
-          ],
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            5321,
-            "rgba(100,100,100,1)",
-            "rgba(209,209,209,1)"
-          ],
-          16,
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            5321,
-            "rgba(100,100,100,1)",
-            "rgba(88,88,88,1)"
-          ]
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          15,
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            5321,
-            0.5,
-            1
-          ],
-          16,
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            5321,
-            2,
-            1
-          ]
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          10,
-          0,
-          14,
-          1
-        ]
-      }
-    },
-    {
-      "id": "bvmap-海岸線堤防等に接する部分破線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "Cstline",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        5103
-      ],
-      "layout": {
-        "line-cap": "round"
-      },
-      "paint": {
-        "line-color": "rgba(100,100,100,1)",
-        "line-width": 1.5,
-        "line-dasharray": [
-          0.2,
-          4
-        ]
-      }
-    },
-    {
-      "id": "bvmap-水涯線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "WL",
-      "paint": {
-        "line-color": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          [
-            5203,
-            5233
-          ],
-          "rgba(100,100,100,1)",
-          "rgba(88,88,88,1)"
-        ],
-        "line-offset": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          [
-            5203,
-            5233
-          ],
-          -1,
-          0
-        ],
-        "line-width": 1
-      }
-    },
-    {
-      "id": "bvmap-水涯線堤防等に接する部分破線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "WL",
-      "filter": [
-        "in",
-        [
-          "get",
-          "vt_code"
-        ],
-        [
-          "literal",
-          [
-            5203,
-            5233
-          ]
-        ]
-      ],
-      "layout": {
-        "line-cap": "round"
-      },
-      "paint": {
-        "line-color": "rgba(100,100,100,1)",
-        "line-width": 1.5,
-        "line-dasharray": [
-          0.2,
-          4
-        ]
-      }
-    },
-    {
-      "id": "bvmap-水部表記線line",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "WRltLine",
-      "filter": [
-        "==",
-        [
-          "geometry-type"
-        ],
-        "LineString"
-      ],
-      "paint": {
-        "line-color": "rgba(99,99,99,1)",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "bvmap-行政区画界線25000所属界（所属を明示する境界線）",
-      "minzoom": 11,
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "AdmBdry",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        1221
-      ],
-      "layout": {
-        "line-cap": "square"
-      },
-      "paint": {
-        "line-color": "rgba(35,35,35,1)",
         "line-dasharray": [
           4,
-          1,
-          1,
-          5
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0,
-          6,
-          1
-        ],
-        "line-width": 1.5
+          2
+        ]
       }
     },
     {
-      "id": "bvmap-行政区画界線25000市区町村界",
-      "minzoom": 11,
+      "id": "vbm-admin-1103",
       "type": "line",
-      "source": "bvmap",
-      "source-layer": "AdmBdry",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        1212
-      ],
-      "layout": {
-        "line-cap": "square"
-      },
+      "source": "vbm",
+      "source-layer": "1103",
       "paint": {
-        "line-color": "rgba(35,35,35,1)",
+        "line-color": "#9b59b6",
+        "line-width": 1,
         "line-dasharray": [
-          6,
-          2,
-          1,
-          2,
+          4,
+          2
+        ]
+      }
+    },
+    {
+      "id": "vbm-area-6201",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "6201",
+      "paint": {
+        "line-color": "#9b59b6",
+        "line-width": 1,
+        "line-dasharray": [
           1,
           2
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0,
-          6,
-          1
-        ],
+        ]
+      }
+    },
+    {
+      "id": "vbm-road-2101",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "2101",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#e8b400",
+        "line-width": 2
+      }
+    },
+    {
+      "id": "vbm-road-2103",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "2103",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#e8b400",
+        "line-width": 2
+      }
+    },
+    {
+      "id": "vbm-road-2106",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "2106",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#e8b400",
         "line-width": 1.5
       }
     },
     {
-      "id": "bvmap-行政区画界線25000都府県界及び北海道総合振興局・振興局界",
+      "id": "vbm-road-2107",
       "type": "line",
-      "source": "bvmap",
-      "source-layer": "AdmBdry",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        1211
-      ],
-      "layout": {
-        "line-cap": "round"
-      },
+      "source": "vbm",
+      "source-layer": "2107",
+      "minzoom": 13,
       "paint": {
-        "line-color": "rgba(35,35,35,1)",
+        "line-color": "#e8b400",
+        "line-width": 2.5
+      }
+    },
+    {
+      "id": "vbm-rail-2301",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "2301",
+      "paint": {
+        "line-color": "#333333",
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "vbm-rail-2306",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "2306",
+      "paint": {
+        "line-color": "#333333",
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "vbm-rail-2311",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "2311",
+      "paint": {
+        "line-color": "#333333",
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "vbm-power-4265",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "4265",
+      "paint": {
+        "line-color": "#999999",
+        "line-width": 0.75
+      }
+    },
+    {
+      "id": "vbm-isobath-7132",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7132",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#5aa0d8",
+        "line-width": 0.75,
         "line-dasharray": [
-          7,
-          5,
-          0.1,
-          5
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0,
-          6,
-          1
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          8,
-          1,
-          9,
-          2.5
-        ]
-      }
-    },
-    {
-      "id": "bvmap-行政区画界線地方界",
-      "maxzoom": 8,
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "AdmBdry",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        1212
-      ],
-      "layout": {
-        "line-cap": "square"
-      },
-      "paint": {
-        "line-color": "rgba(35,35,35,1)",
-        "line-dasharray": [
-          7,
-          5,
-          0.1,
-          5
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          0,
-          6,
-          1
-        ],
-        "line-width": 1
-      }
-    },
-    {
-      "id": "bvmap-行政区画界線国の所属界",
-      "maxzoom": 8,
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "AdmBdry",
-      "filter": [
-        "==",
-        [
-          "get",
-          "vt_code"
-        ],
-        1221
-      ],
-      "layout": {
-        "line-cap": "square"
-      },
-      "paint": {
-        "line-color": "rgba(27,27,27,1)",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "bvmap-等高線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "Cntr",
-      "paint": {
-        "line-color": "rgb(161,161,161)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          9,
-          0.7,
-          12,
-          0.7,
-          13,
-          [
-            "case",
-            [
-              "==",
-              [
-                "%",
-                [
-                  "get",
-                  "vt_alti"
-                ],
-                50
-              ],
-              0
-            ],
-            1.4,
-            0.7
-          ]
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          9,
-          0,
-          10,
-          [
-            "case",
-            [
-              "==",
-              [
-                "%",
-                [
-                  "get",
-                  "vt_alti"
-                ],
-                50
-              ],
-              0
-            ],
-            1,
-            0
-          ],
-          14,
-          [
-            "case",
-            [
-              "==",
-              [
-                "%",
-                [
-                  "get",
-                  "vt_alti"
-                ],
-                50
-              ],
-              0
-            ],
-            1,
-            0
-          ],
-          15,
-          1,
-          16,
-          [
-            "case",
-            [
-              "==",
-              [
-                "get",
-                "vt_code"
-              ],
-              7353
-            ],
-            0,
-            1
-          ]
-        ]
-      }
-    },
-    {
-      "id": "bvmap-等深線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "Isbt",
-      "paint": {
-        "line-color": "rgb(88,88,88)",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "bvmap-地形表記線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "TpgphLine",
-      "paint": {
-        "line-color": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          [
-            7571,
-            7572
-          ],
-          "rgba(88,88,88,1)",
-          "rgb(161,161,161)"
-        ],
-        "line-width": 1,
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          [
-            "case",
-            [
-              "==",
-              [
-                "get",
-                "vt_code"
-              ],
-              7509
-            ],
-            0,
-            1
-          ],
-          16,
-          1
-        ]
-      }
-    },
-    {
-      "id": "bvmap-水部構造物線",
-      "type": "line",
-      "source": "bvmap",
-      "source-layer": "WStrL",
-      "filter": [
-        "step",
-        [
-          "zoom"
-        ],
-        [
-          "any",
-          [
-            "!",
-            [
-              "has",
-              "vt_flag17"
-            ]
-          ],
-          [
-            "in",
-            [
-              "get",
-              "vt_flag17"
-            ],
-            [
-              "literal",
-              [
-                0,
-                1
-              ]
-            ]
-          ]
-        ],
-        17,
-        [
-          "in",
-          [
-            "get",
-            "vt_flag17"
-          ],
-          [
-            "literal",
-            [
-              1,
-              2
-            ]
-          ]
-        ]
-      ],
-      "paint": {
-        "line-color": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          5521,
-          "rgba(88,88,88,1)",
-          "rgba(100,100,100,1)"
-        ],
-        "line-gap-width": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          5514,
           3,
-          0
-        ],
-        "line-opacity": [
-          "match",
-          [
-            "get",
-            "vt_code"
-          ],
-          5532,
-          0.5,
-          1
-        ],
-        "line-width": [
-          "step",
-          [
-            "zoom"
-          ],
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            5501,
-            1,
-            5511,
-            2,
-            5514,
-            1,
-            5515,
-            3.5,
-            5521,
-            2,
-            5532,
-            1,
-            0
-          ],
-          17,
-          [
-            "match",
-            [
-              "get",
-              "vt_code"
-            ],
-            5501,
-            1,
-            5511,
-            2,
-            5514,
-            1,
-            5515,
-            1,
-            5521,
-            2,
-            5532,
-            1,
-            0
-          ]
+          2
         ]
+      }
+    },
+    {
+      "id": "vbm-isobath-7133",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7133",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#5aa0d8",
+        "line-width": 0.5,
+        "line-dasharray": [
+          3,
+          2
+        ]
+      }
+    },
+    {
+      "id": "vbm-isobath-7134",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7134",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#5aa0d8",
+        "line-width": 0.5,
+        "line-dasharray": [
+          3,
+          2
+        ]
+      }
+    },
+    {
+      "id": "vbm-contour-7102",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7102",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#a06a3c",
+        "line-width": 0.5
+      }
+    },
+    {
+      "id": "vbm-contour-7106",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7106",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#a06a3c",
+        "line-width": 0.5
+      }
+    },
+    {
+      "id": "vbm-contour-7101",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7101",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#a06a3c",
+        "line-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-contour-7105",
+      "type": "line",
+      "source": "vbm",
+      "source-layer": "7105",
+      "minzoom": 13,
+      "paint": {
+        "line-color": "#a06a3c",
+        "line-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-point-6221",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "6221",
+      "paint": {
+        "circle-color": "#d64545",
+        "circle-radius": 5,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-6222",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "6222",
+      "paint": {
+        "circle-color": "#e07a3f",
+        "circle-radius": 4,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-6241",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "6241",
+      "paint": {
+        "circle-color": "#3f7fe0",
+        "circle-radius": 4,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-6241-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "6241",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-point-3581",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "3581",
+      "paint": {
+        "circle-color": "#2e8b57",
+        "circle-radius": 4,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-3581-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "3581",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-point-3582",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "3582",
+      "paint": {
+        "circle-color": "#2e8b57",
+        "circle-radius": 4,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-3582-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "3582",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-point-6242",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "6242",
+      "paint": {
+        "circle-color": "#2e8b57",
+        "circle-radius": 4,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-6242-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "6242",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-point-4257",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "4257",
+      "paint": {
+        "circle-color": "#b22222",
+        "circle-radius": 4,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "vbm-point-4257-label",
+      "type": "symbol",
+      "source": "vbm",
+      "source-layer": "4257",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "名称"
+        ],
+        "text-font": [
+          "NotoSansJP-Regular"
+        ],
+        "text-size": 10,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-max-width": 8,
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#222222",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "vbm-point-7135",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "7135",
+      "minzoom": 13,
+      "paint": {
+        "circle-color": "#5aa0d8",
+        "circle-radius": 3
+      }
+    },
+    {
+      "id": "vbm-control-7301",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "7301",
+      "paint": {
+        "circle-color": "#000000",
+        "circle-radius": 3
+      }
+    },
+    {
+      "id": "vbm-control-7302",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "7302",
+      "paint": {
+        "circle-color": "#000000",
+        "circle-radius": 3
+      }
+    },
+    {
+      "id": "vbm-control-7303",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "7303",
+      "paint": {
+        "circle-color": "#000000",
+        "circle-radius": 3
+      }
+    },
+    {
+      "id": "vbm-control-7308",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "7308",
+      "paint": {
+        "circle-color": "#000000",
+        "circle-radius": 3
+      }
+    },
+    {
+      "id": "vbm-annotation-8110",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8110",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8111",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8111",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8114",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8114",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8115",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8115",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8121",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8121",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8122",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8122",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8123",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8123",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8124",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8124",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8125",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8125",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8126",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8126",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8131",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8131",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8151",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8151",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8152",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8152",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8162",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8162",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
+      }
+    },
+    {
+      "id": "vbm-annotation-8171",
+      "type": "circle",
+      "source": "vbm",
+      "source-layer": "8171",
+      "paint": {
+        "circle-color": "#555555",
+        "circle-radius": 2
       }
     },
     {
@@ -4288,6 +4907,40 @@
               "width"
             ]
           ]
+        ]
+      }
+    },
+    {
+      "id": "bvmap-建築物0",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "BldA",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_lvorder"
+        ],
+        0
+      ],
+      "paint": {
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          3101,
+          "rgba(233,233,233,1)",
+          3102,
+          "rgba(203,203,203,1)",
+          3103,
+          "rgba(152,152,152,1)",
+          3111,
+          "rgba(203,203,203,1)",
+          3112,
+          "rgba(203,203,203,1)",
+          "rgba(0,0,0,0)"
         ]
       }
     },
@@ -7779,6 +8432,40 @@
       }
     },
     {
+      "id": "bvmap-建築物1",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "BldA",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_lvorder"
+        ],
+        1
+      ],
+      "paint": {
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          3101,
+          "rgba(233,233,233,1)",
+          3102,
+          "rgba(203,203,203,1)",
+          3103,
+          "rgba(152,152,152,1)",
+          3111,
+          "rgba(203,203,203,1)",
+          3112,
+          "rgba(203,203,203,1)",
+          "rgba(0,0,0,0)"
+        ]
+      }
+    },
+    {
       "id": "bvmap-建築物の外周線1",
       "type": "line",
       "source": "bvmap",
@@ -10554,6 +11241,40 @@
               "width"
             ]
           ]
+        ]
+      }
+    },
+    {
+      "id": "bvmap-建築物2",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "BldA",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_lvorder"
+        ],
+        2
+      ],
+      "paint": {
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          3101,
+          "rgba(233,233,233,1)",
+          3102,
+          "rgba(203,203,203,1)",
+          3103,
+          "rgba(152,152,152,1)",
+          3111,
+          "rgba(203,203,203,1)",
+          3112,
+          "rgba(203,203,203,1)",
+          "rgba(0,0,0,0)"
         ]
       }
     },
@@ -13337,6 +14058,40 @@
       }
     },
     {
+      "id": "bvmap-建築物3",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "BldA",
+      "filter": [
+        "==",
+        [
+          "get",
+          "vt_lvorder"
+        ],
+        3
+      ],
+      "paint": {
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          3101,
+          "rgba(233,233,233,1)",
+          3102,
+          "rgba(203,203,203,1)",
+          3103,
+          "rgba(152,152,152,1)",
+          3111,
+          "rgba(203,203,203,1)",
+          3112,
+          "rgba(203,203,203,1)",
+          "rgba(0,0,0,0)"
+        ]
+      }
+    },
+    {
       "id": "bvmap-建築物の外周線3",
       "type": "line",
       "source": "bvmap",
@@ -16116,6 +16871,40 @@
       }
     },
     {
+      "id": "bvmap-建築物4",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "BldA",
+      "filter": [
+        ">=",
+        [
+          "get",
+          "vt_lvorder"
+        ],
+        4
+      ],
+      "paint": {
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          3101,
+          "rgba(233,233,233,1)",
+          3102,
+          "rgba(203,203,203,1)",
+          3103,
+          "rgba(152,152,152,1)",
+          3111,
+          "rgba(203,203,203,1)",
+          3112,
+          "rgba(203,203,203,1)",
+          "rgba(0,0,0,0)"
+        ]
+      }
+    },
+    {
       "id": "bvmap-建築物の外周線4",
       "type": "line",
       "source": "bvmap",
@@ -17213,6 +18002,26 @@
       }
     },
     {
+      "id": "bvmap-構造物面",
+      "type": "fill",
+      "source": "bvmap",
+      "source-layer": "StrctArea",
+      "paint": {
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "vt_code"
+          ],
+          4301,
+          "rgba(152,152,152,1)",
+          4302,
+          "rgba(233,233,233,1)",
+          "rgba(0,0,0,0)"
+        ]
+      }
+    },
+    {
       "id": "bvmap-構造物面の外周線",
       "type": "line",
       "source": "bvmap",
@@ -17271,815 +18080,6 @@
         ],
         "line-gap-width": 2,
         "line-width": 2
-      }
-    },
-    {
-      "id": "vbm-water-area",
-      "type": "fill",
-      "source": "vbm",
-      "source-layer": "5112",
-      "paint": {
-        "fill-color": "#a6cbe8",
-        "fill-opacity": 0.6
-      }
-    },
-    {
-      "id": "vbm-building-3001",
-      "type": "fill",
-      "source": "vbm",
-      "source-layer": "3001",
-      "minzoom": 13,
-      "paint": {
-        "fill-color": "#c9a98c",
-        "fill-opacity": 0.7
-      }
-    },
-    {
-      "id": "vbm-building-3002",
-      "type": "fill",
-      "source": "vbm",
-      "source-layer": "3002",
-      "minzoom": 13,
-      "paint": {
-        "fill-color": "#c9a98c",
-        "fill-opacity": 0.7
-      }
-    },
-    {
-      "id": "vbm-building-3003",
-      "type": "fill",
-      "source": "vbm",
-      "source-layer": "3003",
-      "minzoom": 13,
-      "paint": {
-        "fill-color": "#c9a98c",
-        "fill-opacity": 0.7
-      }
-    },
-    {
-      "id": "vbm-building-3004",
-      "type": "fill",
-      "source": "vbm",
-      "source-layer": "3004",
-      "minzoom": 13,
-      "paint": {
-        "fill-color": "#c9a98c",
-        "fill-opacity": 0.7
-      }
-    },
-    {
-      "id": "vbm-water-edge-5101",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5101",
-      "paint": {
-        "line-color": "#3b7bb5",
-        "line-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-water-edge-5102",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5102",
-      "paint": {
-        "line-color": "#3b7bb5",
-        "line-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-water-edge-5106",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5106",
-      "paint": {
-        "line-color": "#3b7bb5",
-        "line-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-water-structure-5202",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5202",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-water-structure-5211",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5211",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-water-structure-5226",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5226",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-water-structure-5227",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5227",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-water-structure-5228",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5228",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-water-structure-5232",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5232",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-water-structure-5239",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5239",
-      "paint": {
-        "line-color": "#4a90c4",
-        "line-width": 1
-      }
-    },
-    {
-      "id": "vbm-sabo-5265",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "5265",
-      "paint": {
-        "line-color": "#7a5230",
-        "line-width": 1.5
-      }
-    },
-    {
-      "id": "vbm-admin-1102",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "1102",
-      "paint": {
-        "line-color": "#9b59b6",
-        "line-width": 1,
-        "line-dasharray": [
-          4,
-          2
-        ]
-      }
-    },
-    {
-      "id": "vbm-admin-1103",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "1103",
-      "paint": {
-        "line-color": "#9b59b6",
-        "line-width": 1,
-        "line-dasharray": [
-          4,
-          2
-        ]
-      }
-    },
-    {
-      "id": "vbm-area-6201",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "6201",
-      "paint": {
-        "line-color": "#9b59b6",
-        "line-width": 1,
-        "line-dasharray": [
-          1,
-          2
-        ]
-      }
-    },
-    {
-      "id": "vbm-road-2101",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2101",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#e8b400",
-        "line-width": 2
-      }
-    },
-    {
-      "id": "vbm-road-2103",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2103",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#e8b400",
-        "line-width": 2
-      }
-    },
-    {
-      "id": "vbm-road-2106",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2106",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#e8b400",
-        "line-width": 1.5
-      }
-    },
-    {
-      "id": "vbm-road-2107",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2107",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#e8b400",
-        "line-width": 2.5
-      }
-    },
-    {
-      "id": "vbm-rail-2301",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2301",
-      "paint": {
-        "line-color": "#333333",
-        "line-width": 1.5
-      }
-    },
-    {
-      "id": "vbm-rail-2306",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2306",
-      "paint": {
-        "line-color": "#333333",
-        "line-width": 1.5
-      }
-    },
-    {
-      "id": "vbm-rail-2311",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "2311",
-      "paint": {
-        "line-color": "#333333",
-        "line-width": 1.5
-      }
-    },
-    {
-      "id": "vbm-power-4265",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "4265",
-      "paint": {
-        "line-color": "#999999",
-        "line-width": 0.75
-      }
-    },
-    {
-      "id": "vbm-isobath-7132",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7132",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#5aa0d8",
-        "line-width": 0.75,
-        "line-dasharray": [
-          3,
-          2
-        ]
-      }
-    },
-    {
-      "id": "vbm-isobath-7133",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7133",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#5aa0d8",
-        "line-width": 0.5,
-        "line-dasharray": [
-          3,
-          2
-        ]
-      }
-    },
-    {
-      "id": "vbm-isobath-7134",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7134",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#5aa0d8",
-        "line-width": 0.5,
-        "line-dasharray": [
-          3,
-          2
-        ]
-      }
-    },
-    {
-      "id": "vbm-contour-7102",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7102",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#a06a3c",
-        "line-width": 0.5
-      }
-    },
-    {
-      "id": "vbm-contour-7106",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7106",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#a06a3c",
-        "line-width": 0.5
-      }
-    },
-    {
-      "id": "vbm-contour-7101",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7101",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#a06a3c",
-        "line-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-contour-7105",
-      "type": "line",
-      "source": "vbm",
-      "source-layer": "7105",
-      "minzoom": 13,
-      "paint": {
-        "line-color": "#a06a3c",
-        "line-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-point-6221",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "6221",
-      "paint": {
-        "circle-color": "#d64545",
-        "circle-radius": 5,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-6222",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "6222",
-      "paint": {
-        "circle-color": "#e07a3f",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-6241",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "6241",
-      "paint": {
-        "circle-color": "#3f7fe0",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-6241-label",
-      "type": "symbol",
-      "source": "vbm",
-      "source-layer": "6241",
-      "minzoom": 11,
-      "layout": {
-        "text-field": [
-          "get",
-          "名称"
-        ],
-        "text-font": [
-          "NotoSansJP-Regular"
-        ],
-        "text-size": 10,
-        "text-anchor": "top",
-        "text-offset": [
-          0,
-          0.6
-        ],
-        "text-max-width": 8,
-        "text-optional": true
-      },
-      "paint": {
-        "text-color": "#222222",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-point-3581",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "3581",
-      "paint": {
-        "circle-color": "#2e8b57",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-3581-label",
-      "type": "symbol",
-      "source": "vbm",
-      "source-layer": "3581",
-      "minzoom": 11,
-      "layout": {
-        "text-field": [
-          "get",
-          "名称"
-        ],
-        "text-font": [
-          "NotoSansJP-Regular"
-        ],
-        "text-size": 10,
-        "text-anchor": "top",
-        "text-offset": [
-          0,
-          0.6
-        ],
-        "text-max-width": 8,
-        "text-optional": true
-      },
-      "paint": {
-        "text-color": "#222222",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-point-3582",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "3582",
-      "paint": {
-        "circle-color": "#2e8b57",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-3582-label",
-      "type": "symbol",
-      "source": "vbm",
-      "source-layer": "3582",
-      "minzoom": 11,
-      "layout": {
-        "text-field": [
-          "get",
-          "名称"
-        ],
-        "text-font": [
-          "NotoSansJP-Regular"
-        ],
-        "text-size": 10,
-        "text-anchor": "top",
-        "text-offset": [
-          0,
-          0.6
-        ],
-        "text-max-width": 8,
-        "text-optional": true
-      },
-      "paint": {
-        "text-color": "#222222",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-point-6242",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "6242",
-      "paint": {
-        "circle-color": "#2e8b57",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-6242-label",
-      "type": "symbol",
-      "source": "vbm",
-      "source-layer": "6242",
-      "minzoom": 11,
-      "layout": {
-        "text-field": [
-          "get",
-          "名称"
-        ],
-        "text-font": [
-          "NotoSansJP-Regular"
-        ],
-        "text-size": 10,
-        "text-anchor": "top",
-        "text-offset": [
-          0,
-          0.6
-        ],
-        "text-max-width": 8,
-        "text-optional": true
-      },
-      "paint": {
-        "text-color": "#222222",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-point-4257",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "4257",
-      "paint": {
-        "circle-color": "#b22222",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
-      }
-    },
-    {
-      "id": "vbm-point-4257-label",
-      "type": "symbol",
-      "source": "vbm",
-      "source-layer": "4257",
-      "minzoom": 11,
-      "layout": {
-        "text-field": [
-          "get",
-          "名称"
-        ],
-        "text-font": [
-          "NotoSansJP-Regular"
-        ],
-        "text-size": 10,
-        "text-anchor": "top",
-        "text-offset": [
-          0,
-          0.6
-        ],
-        "text-max-width": 8,
-        "text-optional": true
-      },
-      "paint": {
-        "text-color": "#222222",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1.2
-      }
-    },
-    {
-      "id": "vbm-point-7135",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "7135",
-      "minzoom": 13,
-      "paint": {
-        "circle-color": "#5aa0d8",
-        "circle-radius": 3
-      }
-    },
-    {
-      "id": "vbm-control-7301",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "7301",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
-      }
-    },
-    {
-      "id": "vbm-control-7302",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "7302",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
-      }
-    },
-    {
-      "id": "vbm-control-7303",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "7303",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
-      }
-    },
-    {
-      "id": "vbm-control-7308",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "7308",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
-      }
-    },
-    {
-      "id": "vbm-annotation-8110",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8110",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8111",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8111",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8114",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8114",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8115",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8115",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8121",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8121",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8122",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8122",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8123",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8123",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8124",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8124",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8125",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8125",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8126",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8126",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8131",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8131",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8151",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8151",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8152",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8152",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8162",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8162",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
-      }
-    },
-    {
-      "id": "vbm-annotation-8171",
-      "type": "circle",
-      "source": "vbm",
-      "source-layer": "8171",
-      "paint": {
-        "circle-color": "#555555",
-        "circle-radius": 2
       }
     },
     {

@@ -61,7 +61,7 @@
   - スタイルは `optimal_bvmap` の `style/std.json`（123レイヤー）を丸ごと取得し、Pythonスクリプトで全ての `rgb`/`rgba`/hex色を輝度ベース（`0.299R+0.587G+0.114B`）でグレースケール変換（668色変換）。`match`/`step`式にネストした色も再帰的に置換
   - 日本語ラベル用フォントは、GSI提供のNotoSansJP/NotoSerifJPグリフPBFを使わず、`localIdeographFontFamily: 'sans-serif'`（MapLibre GL JSオプション）でブラウザのシステムフォントを使用するよう変更（漢字グリフの個別取得が不要になり高速）
   - `https://tiles.mapterhorn.com/tilejson.json`（terrarium encoding, webp, tileSize 512）を`raster-dem`ソースとして追加し、`terrain`と`hillshade`の両方に使用。3D地形表示が有効（`pitch: 50`をデフォルトに設定、`TerrainControl`でON/OFF可能）
-  - レイヤ順序をユーザー指示通りに構成: 背景 → hillshade → bvmap塗り面(fill, 11層) → **VLCM**(4層) → bvmap線(line, 99層) → bvmapラベル(symbol, 12層) → **VBM**(61層、最前面)。bvmapの元レイヤーは全て `bvmap-` プレフィックスを付け、`source`を`v`→`bvmap`に付け替え
+  - レイヤ順序をユーザー指示通りに構成: 背景 → hillshade → bvmap塗り面(fill, 11層) → **VLCM**(4層) → bvmap線(line, 99層) → bvmapラベル(symbol, 12層) → **VBM**(61層、最前面)。bvmapの元レイヤーは全て `bvmap-` プレフィックスを付け、`source`を`v`→`bvmap`に付け替え（※この「fill全部→line全部」という大別は後に不具合の原因となり、2026-07-06付けで交互配置に再構築。現在の順序は下記の該当エントリを参照）
   - スタイル統合はPythonスクリプトで実施（189レイヤーを手作業で並べるのは非現実的なため）。マージ後のJSON妥当性・レイヤー順序をjqで確認し、Playwrightで実際に3Dレンダリング・モノトーン配色・ラベル表示を検証（コンソールエラーなし、hillshadeとterrainで同一ソース共有の警告のみ＝実害なし）
 - **2026-07-05: VLCMの配色をGSI公式凡例に基づいて実装**
   - `disaportal.gsi.go.jp`の凡例ページから樽前山の凡例画像（JPEG）を取得し、Pillowでスウォッチのピクセルを実測してRGB値を抽出
@@ -89,6 +89,13 @@
 - **2026-07-06: シームレス空中写真（`stars.optgeo.org/seamlessphoto512`）を薄く追加**
   - `sources.seamlessphoto`（raster, tileSize 512, minzoom 1 / maxzoom 17）を追加し、レイヤーは`background`の直後・`hillshade`より前（最下層）に`raster-opacity: 0.25`で配置。「まずは一番下に薄く」というユーザー指示通り
   - Playwrightでタイルリクエストが実際に発生している（12件）ことを確認。bvmapの塗りがほぼ不透明なため、上に重なるエリアでは写真は見えにくいが、意図通り最下層としては機能している
+- **2026-07-06: レイヤー順序を包括的に見直し、写真がAdmArea（行政区画）の下に隠れる不具合を修正**
+  - ユーザー指摘: 写真が行政界ポリゴンのさらに下に入っているようで表示されない
+  - 原因調査: `merge_style.py`が bvmap の全レイヤーを単純に「fill全部→line全部→symbol全部」で3ブロックに大別・再構成していたため、GSI公式`std.json`が意図的に行っている「建物ポリゴン(BldA)を道路重要度ティア(0-4)の線と交互配置する」という点的例外処理が失われ、さらに`行政区画`(AdmArea, 不透明白の陸地キャンバス色)が他の主題的な塗りと同列に扱われて hillshade・写真より手前（上）に来ていた
+  - 実タイル確認（`stars.optgeo.org/bvmap`をz12/14/15/16で直接fetchしデコード）: AdmAreaはz14以降でのみ出現し、少数の大きなポリゴンで陸地をほぼ全面的に不透明白で覆うことを確認。z12/13では出現せず、それより低ズームで写真/hillshadeが見えていたのは偶然
+  - 修正方針: GSI公式`std.json`のレイヤー順（`gsi_std_gray.json`に保存済みのグレースケール版）をそのまま踏襲して bvmap の fill/line を完全な交互配置で再構築し、`AdmArea`だけを特別扱いして`background`の直後・`seamlessphoto`/`hillshade`より前（最下層、陸地キャンバス）に移動。VBM/VLCMブロックは「bvmapの基礎的な面塗り(Band A: 水域・地形表記面・水部構造物等)の上、道路/建物交互配置ブロック(Band B/C)の下」という既存方針の位置を維持
+  - Playwrightで A/B 検証: 旧スタイルで`bvmap-行政区画`の`fill-opacity`を0にすると初めて地形陰影と写真が見え、新スタイルではデフォルトで既に見えていることを確認（同一座標・同一ズームでスクリーンショット比較）。樽前山のVLCM着色・ラベル・ポップアップには回帰なし
+  - 再構築スクリプト: `reorder_layers.py`（スクラッチパッド、`gsi_std_gray.json`を正順序のソースとして使用）
 - 実装済みの主機能
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）
@@ -116,8 +123,8 @@
 - 属性整形
   - `ID番号` を削除
   - `分類コード` から `tippecanoe.layer` を設定
-  - 等高線系コード（現状: `7102`, `7106`, `7133`, `7135`）に `tippecanoe.minzoom = 11`
-- 最終的に tippecanoe で PMTiles 出力
+  - 等高線・等深線系8コード（`7101/7102/7105/7106/7132/7133/7134/7135`）＋道路4コード（`2101/2103/2106/2107`）＋建物4コード（`3001/3002/3003/3004`）の計16コードに `tippecanoe.minzoom = 13` を付与（`--drop-densest-as-needed` は不採用。詳細は `docs/zoom-policy.md`）
+- 最終的に tippecanoe で PMTiles 出力（`--drop-densest-as-needed` は使わない）
 
 ### 3.3 VLCM 変換方針
 

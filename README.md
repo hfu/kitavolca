@@ -136,7 +136,8 @@ just clean
 - **国土地理院最適化ベクトルタイル**（`https://stars.optgeo.org/bvmap`）をベースマップとして使用。スタイルは [optimal_bvmap](https://github.com/gsi-cyberjapan/optimal_bvmap) の `style/std.json` を元に、全ての色をグレースケール化（`rgb`/`rgba`/hex を輝度ベースでモノトーン変換）
 - 日本語ラベルは `localIdeographFontFamily: 'sans-serif'`（MapLibre GL JS のオプション）でブラウザのシステムフォントを使用し、GSI提供の漢字グリフPBFを個別取得しない
 - **Mapterhorn**（`https://tiles.mapterhorn.com/tilejson.json`、terrarium encoding）を `terrain`・`hillshade` の両方に使用し、3D地形表示に対応（右上のコントロールでON/OFF切り替え可能）
-- レイヤ順序: 背景 → hillshade → bvmap塗り面 → **VLCM** → bvmap線・ラベル → **VBM**（最前面）
+- **シームレス空中写真**（`https://stars.optgeo.org/seamlessphoto512`）を最下層に薄く（`raster-opacity: 0.25`）配置
+- レイヤ順序: 背景 → `行政区画`（陸地の白キャンバス） → 写真 → hillshade → bvmap基礎面塗り（水域・地形表記等） → **VLCM** → **VBM** → bvmap道路/建物（GSI公式`std.json`通りの交互配置） → bvmapラベル（最前面）。建物ポリゴンは道路の重要度ティアと交互に描画され、GSI公式スタイルの立体感を再現している
 
 ## レイヤ設計（MapLibre 向け）
 
