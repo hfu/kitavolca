@@ -56,6 +56,13 @@
   - **2026-07-05 追記**: ユーザーが実際に `https://stars.optgeo.org/vbm` と `https://stars.optgeo.org/vlcm` にデプロイ完了（ソース名は `kitavolca-vbm/vlcm` ではなく単に `vbm`/`vlcm`）。`docs/style.json` の本番URLをこれに合わせて修正し、Playwrightで本番環境に対しても表示確認済み（ローカル確認時と同一の見た目で正常表示、コンソールエラーなし）
   - スタイルは`docs/schema.md`で特定した分類コードの実際の意味（道路・建物・等高線・海岸線等）ごとにグルーピング。国土地理院最適化ベクトルタイル（[optimal_bvmap](https://github.com/gsi-cyberjapan/optimal_bvmap)）の実データ（`https://stars.optgeo.org/bvmap` のTileJSON）から実際のレイヤー別minzoom設計（道路z4・建物z14・等高線z9・海岸線z4等）を確認し参考にした
   - Playwright（`npx playwright install chromium`、実行はスクラッチディレクトリで）でヘッドレスブラウザ検証済み: GSI標準地図と重ねた表示、VLCM featureクリックでの属性ポップアップ（`natural`レイヤー、`name=溶岩円頂丘`等）、高ズームでの等高線・建物・道路描画（minzoom=13が正しく機能）を確認。コンソールエラーなし
+- **2026-07-05: 背景地図をGSI最適化ベクトルタイル + Mapterhorn地形に変更**
+  - ラスタ標準地図（`gsi-std`）を廃止し、`https://stars.optgeo.org/bvmap`（GSI最適化ベクトルタイル、Martin配信）をベクトル背景として採用
+  - スタイルは `optimal_bvmap` の `style/std.json`（123レイヤー）を丸ごと取得し、Pythonスクリプトで全ての `rgb`/`rgba`/hex色を輝度ベース（`0.299R+0.587G+0.114B`）でグレースケール変換（668色変換）。`match`/`step`式にネストした色も再帰的に置換
+  - 日本語ラベル用フォントは、GSI提供のNotoSansJP/NotoSerifJPグリフPBFを使わず、`localIdeographFontFamily: 'sans-serif'`（MapLibre GL JSオプション）でブラウザのシステムフォントを使用するよう変更（漢字グリフの個別取得が不要になり高速）
+  - `https://tiles.mapterhorn.com/tilejson.json`（terrarium encoding, webp, tileSize 512）を`raster-dem`ソースとして追加し、`terrain`と`hillshade`の両方に使用。3D地形表示が有効（`pitch: 50`をデフォルトに設定、`TerrainControl`でON/OFF可能）
+  - レイヤ順序をユーザー指示通りに構成: 背景 → hillshade → bvmap塗り面(fill, 11層) → **VLCM**(4層) → bvmap線(line, 99層) → bvmapラベル(symbol, 12層) → **VBM**(61層、最前面)。bvmapの元レイヤーは全て `bvmap-` プレフィックスを付け、`source`を`v`→`bvmap`に付け替え
+  - スタイル統合はPythonスクリプトで実施（189レイヤーを手作業で並べるのは非現実的なため）。マージ後のJSON妥当性・レイヤー順序をjqで確認し、Playwrightで実際に3Dレンダリング・モノトーン配色・ラベル表示を検証（コンソールエラーなし、hillshadeとterrainで同一ソース共有の警告のみ＝実害なし）
 - 実装済みの主機能
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）

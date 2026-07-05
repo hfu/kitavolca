@@ -131,6 +131,13 @@ just clean
 - ローカル確認: `just serve` 実行後に `?source=local` を付けてアクセスすると、`pmtiles serve dst --port 8080` が配信する `http://localhost:8080/vbm|vlcm/{z}/{x}/{y}.mvt`（`pmtiles serve` の URL 規約、`.mvt` 拡張子あり。Martin とは形式が異なるので注意）に切り替わる
 - 地図クリックで、その地点の feature 属性（`分類コード`・`tippecanoe.layer` 等）をポップアップ表示
 
+### 背景地図
+
+- **国土地理院最適化ベクトルタイル**（`https://stars.optgeo.org/bvmap`）をベースマップとして使用。スタイルは [optimal_bvmap](https://github.com/gsi-cyberjapan/optimal_bvmap) の `style/std.json` を元に、全ての色をグレースケール化（`rgb`/`rgba`/hex を輝度ベースでモノトーン変換）
+- 日本語ラベルは `localIdeographFontFamily: 'sans-serif'`（MapLibre GL JS のオプション）でブラウザのシステムフォントを使用し、GSI提供の漢字グリフPBFを個別取得しない
+- **Mapterhorn**（`https://tiles.mapterhorn.com/tilejson.json`、terrarium encoding）を `terrain`・`hillshade` の両方に使用し、3D地形表示に対応（右上のコントロールでON/OFF切り替え可能）
+- レイヤ順序: 背景 → hillshade → bvmap塗り面 → **VLCM** → bvmap線・ラベル → **VBM**（最前面）
+
 ## レイヤ設計（MapLibre 向け）
 
 ### VLCM

@@ -25,6 +25,7 @@
   <h1>kitavolca プレビュー</h1>
   <div id="mode"></div>
   <div>データ: 国土地理院 VBM/VLCM（<a href="https://github.com/hfu/kitavolca" target="_blank">kitavolca</a>）</div>
+  <div>背景: <a href="https://github.com/gsi-cyberjapan/optimal_bvmap" target="_blank">最適化ベクトルタイル</a>（モノトーン）+ <a href="https://mapterhorn.com/" target="_blank">Mapterhorn</a> 地形陰影</div>
   <div>ローカルの <code>dst/*.pmtiles</code> で確認する場合は、まず
     <code>just serve</code> を実行してから
     <a href="?source=local">?source=local</a> を付けてアクセス。</div>
@@ -52,10 +53,16 @@ fetch('style.json')
       container: 'map',
       style,
       center: [141.38, 42.69], // 樽前山
-      zoom: 11
+      zoom: 11,
+      pitch: 50,
+      // bvmap のラベルは NotoSansJP/NotoSerifJP のグリフを参照するが、
+      // CJK文字はブラウザのシステム sans-serif フォントで描画させる
+      // （何千もの漢字グリフPBFを取得せずに済み、表示も速い）
+      localIdeographFontFamily: 'sans-serif'
     });
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+    map.addControl(new maplibregl.TerrainControl({ source: 'mapterhorn', exaggeration: 1 }), 'top-right');
 
     map.on('click', (e) => {
       const features = map.queryRenderedFeatures(e.point);
