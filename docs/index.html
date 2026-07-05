@@ -47,6 +47,7 @@ fetch('style.json')
     const map = new maplibregl.Map({
       container: 'map',
       style,
+      hash: 'hash',
       center: [141.38, 42.69], // 樽前山
       zoom: 11,
       pitch: 50,
