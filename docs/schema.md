@@ -153,9 +153,10 @@ jq -r 'select(.properties["分類コード"]==<code>) | .properties["標高"]' w
 
 `work/vlcm/natural.ndjson`, `work/vlcm/artificial.ndjson` を実測（`jq -r '.properties | keys | join(",")' | sort -u`）。
 
-- `ID`, `code1`, `code2`, `code3`, `code4`, `name` のみ。全レイヤ共通で、VBM のような分岐はない
+- `ID`, `code1`, `code2`, `code3`, `code4`, `name` が基本セット（2024年版までの5火山で共通、VBM のような分岐はない）
 - `code1`〜`code4` は階層的な分類コード（桁数が増えるほど詳細）。例: `code1=1, code2=101, code3=10101, code4=1010101, name=火口跡`
 - `name` はすでに日本語の人間可読ラベル（VBM の数値 `分類コード` と異なり、別途コード表を参照しなくても意味がわかる）
+- **例外（恵山、2026年版）**: 下記「2026-07-16 追記」参照。基本セットに加えて `code`, `code5`, `code6`, `class1`〜`class6` を持つ、より詳細な新スキーマ
 
 ### 保持する属性（確定）
 
@@ -205,6 +206,31 @@ Playwrightで雌阿寒岳・十勝岳・北海道駒ヶ岳・恵山の4火山を
 Playwrightで確認したところ、単調な灰色一色から、ドーム地形（紫系）・火砕流堆積地（サーモン系）・侵食地形（緑灰系）等に色が分かれ、視覚的な情報量が大幅に向上した。ただし実測ではなく類推による色のため、実際にGSIが恵山の凡例を公開した際は差し替えが必要。
 
 また、`natural` レイヤーには Polygon/LineString 以外に **Point**（`噴気孔`, `泥火山`。十勝岳のデータで新規発見）も存在することが分かり、`vlcm-natural-point`（circle レイヤー）を追加した。
+
+### 2026-07-16 追記: 恵山（2026年版・新スキーマ）の属性を追加保持
+
+測量成果使用承認取得後の再生成（`just build-vlcm`）で `just validate` が失敗し、原因を調べたところ `esan_vlcm.zip`（ファイル名 `vlcm_shp-09esn-2026`）が他火山（2024年版）と異なる、より詳細な属性スキーマを持つことが判明した。GSI が恵山を新スキーマで公開し直した、いわゆる「ニュープロダクト」である。
+
+- 従来（2024年版・5火山共通）: `ID`, `code1`, `code2`, `code3`, `code4`, `name`（6キー）
+- 恵山（2026年版）: 上記に加えて `code`（`code1`〜`code6` を連結した12桁の完全パスコードとみられる。例 `101000100100`）, `code5`, `code6`, `class1`〜`class6`（`name` に至るまでの分類階層を段階ごとに文字列化したもの）
+
+サンプル（`work/vlcm/natural_0.ndjson` より）:
+```json
+{
+  "ID": 1,
+  "code1": "1", "code2": "01", "code3": "00", "code4": "01", "code5": "001", "code6": "00",
+  "code": "101000100100",
+  "class1": "火山地形", "class2": "火口・カルデラ", "class3": null,
+  "class4": "火口・カルデラ地形", "class5": "火口・カルデラ縁", "class6": null,
+  "name": "火口・カルデラ縁"
+}
+```
+
+**対応方針**: 新属性はそのまま `dst/vlcm.pmtiles` に保持する（`build-vlcm.sh` に属性フィルタは元々無く、`ogr2ogr` の出力をそのまま tippecanoe に渡している）。`Justfile` の `validate` タスクの許可属性リスト（`known`）に `code`, `code5`, `code6`, `class1`〜`class6` を追加して対応した。
+
+**`docs/style.json` への影響は無し**: VLCM の配色は Polygon/LineString とも `name` 属性（地形名の文字列）への `match` 式で決まっており（フォールバックのみ `code2` を参照、[docs/style.json:1421](../docs/style.json)）、`class1`〜`class6`・`code`・`code5`・`code6` はどこからも参照されない。恵山の `name` 値47種のうち46種は既存の類推配色（上記「2026-07-06 追記」参照）でカバー済み。唯一未登録の `地形界`（802件、すべて `LineString`）はデフォルトのフォールバック配色（`rgba(0,0,0,0.4)`）で描画され、破綻はない。
+
+**今後**: 他火山も GSI 側で新スキーマに更新された場合、同様に `class1`〜`class6` 等が出現する可能性がある。その際は本節と同じ手順（`known` リスト更新、`name` の新規値がスタイルに未登録でないか確認）で対応する。
 
 ## Refinement Process（今後の火山データ追加時）
 
