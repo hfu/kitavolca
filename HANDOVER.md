@@ -102,6 +102,14 @@
   - 真因: 白い`行政区画`＋その上のhillshadeに対し、写真を`raster-opacity: 0.25`で重ねると、特に低ズームでは色が薄まりほぼ白飛びして見えなくなる（z-order の不具合ではなく、コントラスト不足）。ズームが低いほど地物が疎らで他の主題色と競合しないため、写真をもっと見せても問題ない
   - 対応: `seamlessphoto`の`raster-opacity`をズーム依存の`interpolate`式に変更（z5:0.6 → z9:0.4 → z12:0.25）。火山詳細ズーム（z12以降）では従来通り薄いまま、広域俯瞰では航空写真がはっきり見えるように
   - Playwrightで z7 全道表示と z11 樽前山表示の両方をスクリーンショット比較し、狙い通りの見た目と既存VLCM配色への影響なしを確認
+- **2026-07-16: 測量法に基づく国土地理院長の使用承認を取得し、成果品に反映**
+  - 令和8年7月14日付・国地情使第207号（申請ID `91qoqcaa7y_20260706_044610`）で承認。承認番号「**測量法に基づく国土地理院長承認（使用）R 8JHs 207**」を、承認条件(1)通り成果品（`dst/*.pmtiles`）の見やすい箇所に明示する必要がある
+  - `tippecanoe -A` の値（`scripts/build-vbm.sh`/`scripts/build-vlcm.sh`、旧: `"GSI"`）と、`docs/style.json` の `sources.vbm`/`sources.vlcm` の `attribution`（旧: 日本語のデータ種別名）を、承認文言そのものに統一。地図上に実際に表示される attribution（`docs/style.json` 側）が「見やすいところ」の要件を満たす本命
+  - 承認条件(2)「Web上で公開される場合はサイトのURLを報告」は**未対応**（次のアクション）。使用期間は承認後6か月間（〜2027年1月頃）
+  - 承認書は `~/Downloads/承認書_令08情使第207号.pdf`（リポジトリ外）
+  - `README.md`「データ利用とコンプライアンス」節にも承認番号・条件を追記済み
+  - 同日、`just upload`（`rsync --progress dst/*.pmtiles stars@stars.local:/home/stars/data/`）タスクを新設し、Justfile に本番アップロード手順を明文化。再生成→`just validate`→`just upload`の順で実行し本番反映済み
+  - 再生成時、恵山（`esan_vlcm.zip`、`vlcm_shp-09esn-2026`）が2026年版の新スキーマ（`code`/`code5`/`code6`/`class1`〜`class6`を追加保持）で公開されていることが`just validate`のエラーで発覚。データはそのまま保持する方針とし、`Justfile`の`validate`許可リストと`docs/schema.md`を更新（スタイルは`name`属性ベースの配色のため影響なしと確認済み）
   - `scripts/fetch-vbm.sh` で VBM 入力データ（Shapefile ZIP）を GSI から取得
   - `scripts/build-vlcm.sh` で VLCM PMTiles 生成（`src/*_vlcm.zip` を結合処理）
   - `scripts/build-vbm.sh` で VBM PMTiles 生成（`src/*_vbm.zip` を結合処理）
