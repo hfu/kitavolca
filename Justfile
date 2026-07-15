@@ -171,7 +171,7 @@ validate:
     for f in work/vlcm/natural.ndjson work/vlcm/artificial.ndjson; do
         [ -f "$f" ] || continue
         vlcm_found=1
-        known="ID code1 code2 code3 code4 name"
+        known="ID code1 code2 code3 code4 code5 code6 code class1 class2 class3 class4 class5 class6 name"
         unexpected=$(jq -r '.properties | keys[]' "$f" | sort -u | while read -r k; do
             printf '%s\n' "$known" | tr ' ' '\n' | grep -qxF "$k" || echo "$k"
         done)
@@ -191,6 +191,20 @@ validate:
         echo "❌ 検証エラー: ${errors}件"
         exit 1
     fi
+
+# upload: 生成済み PMTiles を本番サーバー (stars.optgeo.org) へ rsync でアップロード
+upload:
+    #!/usr/bin/env bash
+    set -e
+    for pmtiles in dst/vbm.pmtiles dst/vlcm.pmtiles; do
+        [ -f "$pmtiles" ] || { echo "❌ $pmtiles が見つかりません。先に 'just build-vbm'/'just build-vlcm' を実行してください"; exit 1; }
+    done
+    echo "=== 本番サーバーへアップロード ==="
+    for pmtiles in dst/vbm.pmtiles dst/vlcm.pmtiles; do
+        echo "→ $pmtiles"
+        rsync --progress "$pmtiles" stars@stars.local:/home/stars/data/
+    done
+    echo "✓ アップロード完了"
 
 # clean: 生成物の削除
 clean:

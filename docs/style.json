@@ -10,7 +10,7 @@
       ],
       "minzoom": 5,
       "maxzoom": 14,
-      "attribution": "国土地理院 火山基本図 (VBM)"
+      "attribution": "測量法に基づく国土地理院長承認（使用）R 8JHs 207"
     },
     "vlcm": {
       "type": "vector",
@@ -19,7 +19,7 @@
       ],
       "minzoom": 5,
       "maxzoom": 14,
-      "attribution": "国土地理院 火山土地条件図 (VLCM)"
+      "attribution": "測量法に基づく国土地理院長承認（使用）R 8JHs 207"
     },
     "bvmap": {
       "type": "vector",
