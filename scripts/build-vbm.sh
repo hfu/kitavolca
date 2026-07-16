@@ -113,7 +113,7 @@ fi
 echo ""
 echo "3. PMTiles を生成中..."
 
-if ! tippecanoe --force -P -n "Hokkaido VBM" -A "測量法に基づく国土地理院長承認（使用）R 8JHs 207" -N "kitavolca-vbm" --no-progress-indicator -Z 5 -z 14 -o "${WORKSPACE_DIR}/dst/vbm.pmtiles" "$WORK_DIR/vbm_filtered.ndjson"; then
+if ! tippecanoe --force -P -n "Hokkaido VBM" -A "火山基本図 測量法に基づく国土地理院長承認（使用）R 8JHs 207" -N "kitavolca-vbm" --no-progress-indicator -Z 5 -z 14 -o "${WORKSPACE_DIR}/dst/vbm.pmtiles" "$WORK_DIR/vbm_filtered.ndjson"; then
     echo "❌ [3. tippecanoe] PMTiles 生成に失敗しました（上記の tippecanoe 出力を確認してください）"
     exit 1
 fi

@@ -95,7 +95,7 @@ tippecanoe_args=(
     --force
     -P
     -n "Hokkaido VLCM"
-    -A "測量法に基づく国土地理院長承認（使用）R 8JHs 207"
+    -A "火山土地条件図 測量法に基づく国土地理院長承認（使用）R 8JHs 207"
     -N "kitavolca-vlcm"
     --no-progress-indicator
     -Z 5

@@ -5,21 +5,15 @@
   "sources": {
     "vbm": {
       "type": "vector",
-      "tiles": [
-        "https://stars.optgeo.org/vbm/{z}/{x}/{y}"
-      ],
+      "url": "https://stars.optgeo.org/vbm",
       "minzoom": 5,
-      "maxzoom": 14,
-      "attribution": "測量法に基づく国土地理院長承認（使用）R 8JHs 207"
+      "maxzoom": 14
     },
     "vlcm": {
       "type": "vector",
-      "tiles": [
-        "https://stars.optgeo.org/vlcm/{z}/{x}/{y}"
-      ],
+      "url": "https://stars.optgeo.org/vlcm",
       "minzoom": 5,
-      "maxzoom": 14,
-      "attribution": "測量法に基づく国土地理院長承認（使用）R 8JHs 207"
+      "maxzoom": 14
     },
     "bvmap": {
       "type": "vector",

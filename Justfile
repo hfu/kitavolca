@@ -241,7 +241,7 @@ serve:
     echo "  サイト:   http://localhost:8000/?source=local"
     echo "  タイル:   http://localhost:8080/ (pmtiles serve, Ctrl+C で両方停止)"
     echo ""
-    pmtiles serve dst --port 8080 --cors "*" &
+    pmtiles serve dst --port 8080 --cors "*" --public-url http://localhost:8080/ &
     TILE_PID=$!
     trap 'kill "$TILE_PID" 2>/dev/null' EXIT
     (cd docs && python3 -m http.server 8000)

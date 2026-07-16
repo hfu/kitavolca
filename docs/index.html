@@ -6,78 +6,74 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@digital-go-jp/design-tokens@2.0.1/dist/tokens.css">
+<link rel="stylesheet" href="dads-components.css">
 <style>
   html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
   #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-  #panel {
-    position: absolute; top: 10px; left: 10px; z-index: 1;
-    background: rgba(255,255,255,0.92); border-radius: 6px; padding: 10px 14px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3); max-width: 320px; font-size: 13px; line-height: 1.5;
+  .panel {
+    position: absolute; top: 0; left: 0; max-width: 22rem; max-height: 100vh;
+    display: flex; flex-direction: column;
+    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-radius: 0 0 var(--border-radius-12) 0; box-shadow: var(--elevation-1);
+    z-index: 10; line-height: 1.45; font-size: 0.88rem;
+    transition: width 0.2s ease, height 0.2s ease;
   }
-  #panel h1 { font-size: 14px; margin: 0 0 6px; }
-  #panel code { background: #eee; padding: 1px 4px; border-radius: 3px; }
-  #panel a { color: #2a6ebb; }
+  .panel[data-collapsed="false"] { padding: .9rem 1rem; }
+  .panel[data-collapsed="true"] { width: 2.75rem; height: 2.75rem; padding: .4rem; overflow: hidden; }
+  .panel__toggle { flex: none; align-self: flex-start; background: transparent; border: none; cursor: pointer; padding: 0.2rem; color: currentColor; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
+  .panel[data-collapsed="true"] .panel__toggle svg { transform: scaleX(-1); }
+  .panel__content { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .panel[data-collapsed="true"] .panel__content { display: none; }
+  .panel h1 { font-size: 1rem; margin: 0 0 .4rem; }
+  .panel .layers { margin: .5rem 0; }
+  .panel .layer-item { margin-bottom: .5rem; }
+  .panel .layer-item label { display: block; }
+  .panel .vlcm-legend { margin-top: .3rem; max-height: 12rem; overflow-y: auto; }
+  .panel .legend-row { display: flex; align-items: center; gap: .4rem; font-size: .78rem; margin-bottom: .15rem; }
+  .panel .legend-swatch { width: .9rem; height: .9rem; border-radius: 2px; flex: none; border: 1px solid rgba(0,0,0,.15); }
+  .panel .legend-empty { font-size: .78rem; color: #666; margin: .3rem 0 0; }
 </style>
 </head>
 <body>
 <div id="map"></div>
-<div id="panel">
-  <h1>kitavolca プレビュー</h1>
-  <div id="mode"></div>
+<div class="panel" data-collapsed="false">
+  <button id="panel-toggle" class="panel__toggle" type="button" aria-expanded="true" aria-label="パネルを折りたたむ/展開する">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="display:inline-block;">
+      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="panel__content">
+    <h1>kitavolca</h1>
+    <div class="layers">
+      <div class="layer-item">
+        <label class="dads-checkbox" data-size="sm">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="bvmap" checked></span>
+          <span class="dads-checkbox__label">国土地理院最適化ベクトルタイル</span>
+        </label>
+      </div>
+      <div class="layer-item">
+        <label class="dads-checkbox" data-size="sm">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="vbm" checked></span>
+          <span class="dads-checkbox__label">火山基本図</span>
+        </label>
+      </div>
+      <div class="layer-item">
+        <label class="dads-checkbox" data-size="sm">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="vlcm" checked></span>
+          <span class="dads-checkbox__label">火山土地条件図</span>
+        </label>
+        <div class="vlcm-legend"></div>
+      </div>
+      <div class="layer-item">
+        <label class="dads-checkbox" data-size="sm">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="seamlessphoto" checked></span>
+          <span class="dads-checkbox__label">シームレス空中写真</span>
+        </label>
+      </div>
+    </div>
+  </div>
 </div>
-<script>
-const params = new URLSearchParams(location.search);
-const useLocal = params.get('source') === 'local';
-// `just serve` runs `pmtiles serve dst --port 8080`, which uses a
-// {z}/{x}/{y}.mvt URL convention (different from Martin's extension-less
-// URLs on stars.optgeo.org production).
-const LOCAL_TILE_PORT = 8080;
-
-document.getElementById('mode').textContent = useLocal
-  ? `モード: ローカル (pmtiles serve, port ${LOCAL_TILE_PORT})`
-  : 'モード: 本番 (stars.optgeo.org)';
-
-fetch('style.json')
-  .then(r => r.json())
-  .then(style => {
-    if (useLocal) {
-      style.sources.vbm.tiles = [`http://localhost:${LOCAL_TILE_PORT}/vbm/{z}/{x}/{y}.mvt`];
-      style.sources.vlcm.tiles = [`http://localhost:${LOCAL_TILE_PORT}/vlcm/{z}/{x}/{y}.mvt`];
-    }
-    const map = new maplibregl.Map({
-      container: 'map',
-      style,
-      hash: 'hash',
-      center: [141.38, 42.69], // 樽前山
-      zoom: 11,
-      pitch: 50,
-      // bvmap のラベルは NotoSansJP/NotoSerifJP のグリフを参照するが、
-      // CJK文字はブラウザのシステム sans-serif フォントで描画させる
-      // （何千もの漢字グリフPBFを取得せずに済み、表示も速い）
-      localIdeographFontFamily: 'sans-serif'
-    });
-    map.addControl(new maplibregl.NavigationControl(), 'top-right');
-    map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-    map.addControl(new maplibregl.TerrainControl({ source: 'mapterhorn', exaggeration: 1 }), 'top-right');
-
-    map.on('click', (e) => {
-      const features = map.queryRenderedFeatures(e.point);
-      if (!features.length) return;
-      const rows = features.slice(0, 8).map(f =>
-        `<tr><td><code>${f.layer['source-layer'] || f.layer.id}</code></td><td>${
-          Object.entries(f.properties).map(([k, v]) => `${k}=${v}`).join(', ')
-        }</td></tr>`
-      ).join('');
-      new maplibregl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(`<table style="font-size:12px">${rows}</table>`)
-        .addTo(map);
-    });
-  })
-  .catch(err => {
-    document.getElementById('panel').innerHTML +=
-      `<div style="color:#b00">style.json の読み込みに失敗: ${err}</div>`;
-  });
-</script>
+<script src="app.js"></script>
 </body>
 </html>

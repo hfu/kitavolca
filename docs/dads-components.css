@@ -1,0 +1,310 @@
+/* Digital Agency Design System (DADS) components
+ * Vendored from digital-go-jp/design-system-example-components-html commit 3b34f4c
+ * License: MIT
+ * Only required classes extracted for this project's Button, Checkbox, and Disclosure components
+ */
+
+/* global.css: accessibility and link styles */
+:focus-visible {
+  outline: calc(4 / 16 * 1rem) solid var(--color-neutral-black);
+  outline-offset: calc(2 / 16 * 1rem);
+  border-radius: calc(4 / 16 * 1rem);
+  box-shadow: 0 0 0 calc(2 / 16 * 1rem) var(--color-primitive-yellow-300);
+}
+
+:where(a):any-link {
+  color: var(--color-primitive-blue-1000);
+  text-decoration: underline;
+  text-decoration-thickness: calc(1 / 16 * 1rem);
+  text-underline-offset: calc(3 / 16 * 1rem);
+}
+
+:where(a):visited {
+  color: var(--color-primitive-magenta-900);
+}
+
+@media (hover: hover) {
+  :where(a):hover {
+    color: var(--color-primitive-blue-900);
+    text-decoration-thickness: calc(3 / 16 * 1rem);
+  }
+}
+
+:where(a):active {
+  color: var(--color-primitive-orange-800);
+  text-decoration-thickness: calc(1 / 16 * 1rem);
+}
+
+/* button.css */
+.dads-button {
+  --button-color: var(--color-key-900);
+  --button-hover-color: var(--color-key-1000);
+  --button-active-color: var(--color-key-1200);
+  --button-outline-hover-bg-color: var(--color-key-200);
+  --button-outline-active-bg-color: var(--color-key-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: calc(4 / 16 * 1rem);
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  font-weight: bold;
+  font-size: calc(16 / 16 * 1rem);
+  line-height: 1;
+  font-family: var(--font-family-sans);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-underline-offset: calc(3 / 16 * 1rem);
+}
+
+.dads-button:disabled,
+.dads-button[aria-disabled="true"] {
+  cursor: default;
+}
+
+.dads-button[data-type="solid-fill"] {
+  border: 4px double transparent;
+  background-color: var(--button-color);
+  color: var(--color-neutral-white);
+}
+
+@media (hover: hover) {
+  .dads-button[data-type="solid-fill"]:hover {
+    background-color: var(--button-hover-color);
+    text-decoration: underline;
+    text-decoration-thickness: calc(1 / 16 * 1rem);
+  }
+}
+
+.dads-button[data-type="solid-fill"]:active {
+  background-color: var(--button-active-color);
+  text-decoration: underline;
+}
+
+.dads-button[data-type="solid-fill"]:focus-visible {
+  outline: calc(4 / 16 * 1rem) solid var(--color-neutral-black);
+  outline-offset: calc(2 / 16 * 1rem);
+  box-shadow: 0 0 0 calc(2 / 16 * 1rem) var(--color-primitive-yellow-300);
+}
+
+.dads-button[data-type="solid-fill"]:disabled,
+.dads-button[data-type="solid-fill"][aria-disabled="true"] {
+  background-color: var(--color-neutral-solid-gray-300);
+  color: var(--color-neutral-solid-gray-50);
+  text-decoration: none;
+}
+
+.dads-button[data-type="outline"] {
+  border: 1px solid currentcolor;
+  background-color: var(--color-neutral-white);
+  color: var(--button-color);
+}
+
+@media (hover: hover) {
+  .dads-button[data-type="outline"]:hover {
+    background-color: var(--button-outline-hover-bg-color);
+    color: var(--button-hover-color);
+    text-decoration: underline;
+    text-decoration-thickness: calc(1 / 16 * 1rem);
+  }
+}
+
+.dads-button[data-type="outline"]:active {
+  background-color: var(--button-outline-active-bg-color);
+  color: var(--button-active-color);
+  text-decoration: underline;
+}
+
+.dads-button[data-type="outline"]:focus-visible {
+  outline: calc(4 / 16 * 1rem) solid var(--color-neutral-black);
+  outline-offset: calc(2 / 16 * 1rem);
+  box-shadow: 0 0 0 calc(2 / 16 * 1rem) var(--color-primitive-yellow-300);
+}
+
+.dads-button[data-type="outline"]:disabled,
+.dads-button[data-type="outline"][aria-disabled="true"] {
+  background-color: var(--color-neutral-white);
+  color: var(--color-neutral-solid-gray-300);
+  text-decoration: none;
+}
+
+.dads-button[data-size="md"] {
+  min-width: calc(96 / 16 * 1rem);
+  min-height: calc(48 / 16 * 1rem);
+  border-radius: calc(8 / 16 * 1rem);
+  padding: calc(8 / 16 * 1rem) calc(16 / 16 * 1rem);
+}
+
+/* checkbox.css */
+.dads-checkbox {
+  display: flex;
+  align-items: start;
+  gap: calc(8 / 16 * 1rem);
+  width: fit-content;
+}
+
+.dads-checkbox:has(.dads-checkbox__label:not(:empty)) {
+  padding-top: calc(8 / 16 * 1rem);
+  padding-bottom: calc(8 / 16 * 1rem);
+}
+
+.dads-checkbox[data-size="sm"] {
+  --_gap: calc(4 / 16 * 1rem);
+  --_checkbox-size: calc(24 / 16 * 1rem);
+  --_checkbox-border-width: calc(2 / 16 * 1rem);
+  --_checkbox-scale: 1;
+  --_label-padding-top: calc(1 / 16 * 1rem);
+  --_label-font-size: calc(16 / 16 * 1rem);
+}
+
+.dads-checkbox__checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  width: var(--_checkbox-size);
+  height: var(--_checkbox-size);
+  border-radius: 12.5%;
+}
+
+@media (hover: hover) {
+  .dads-checkbox__checkbox:has(
+    :not(:focus, :disabled, [aria-disabled="true"]):hover
+  ) {
+    background-color: var(--color-neutral-solid-gray-420);
+  }
+}
+
+.dads-checkbox__input {
+  --_base-color: var(--color-neutral-white);
+  --_accent-color: var(--color-key-900);
+  --_accent-hover-color: var(--color-key-1100);
+  --_border-color: var(--color-neutral-solid-gray-600);
+  --_border-hover-color: var(--color-neutral-black);
+  --_check-color: var(--color-neutral-white);
+  margin: 0;
+  appearance: none;
+  width: 75%;
+  height: 75%;
+  border-radius: calc(2 / 18 * 100%);
+  background-color: var(--_base-color);
+  background-clip: padding-box;
+  border: var(--_checkbox-border-width) solid var(--_border-color);
+}
+
+.dads-checkbox__input:focus-visible {
+  outline: calc(4 / 16 * 1rem) solid var(--color-neutral-black);
+  outline-offset: calc(2 / 16 * 1rem);
+  box-shadow: 0 0 0 calc(2 / 16 * 1rem) var(--color-primitive-yellow-300);
+}
+
+@media (hover: hover) {
+  .dads-checkbox__input:not(:disabled, [aria-disabled="true"]):hover {
+    border-color: var(--_border-hover-color);
+  }
+}
+
+.dads-checkbox__input:is(:checked, :indeterminate) {
+  border-color: var(--_accent-color);
+  background-color: var(--_accent-color);
+}
+
+@media (hover: hover) {
+  .dads-checkbox__input:is(:checked, :indeterminate):not(
+    :disabled,
+    [aria-disabled="true"]
+  ):hover {
+    border-color: var(--_accent-hover-color);
+    background-color: var(--_accent-hover-color);
+  }
+}
+
+.dads-checkbox__input::before {
+  display: none;
+  width: calc(14 / 16 * 1rem);
+  height: calc(14 / 16 * 1rem);
+  background-color: var(--_check-color);
+  transform-origin: left top;
+  transform: scale(var(--_checkbox-scale, 1));
+  content: "";
+}
+
+.dads-checkbox__input:checked::before {
+  display: block;
+  clip-path: path(
+    "M5.6,11.2L12.65,4.15L11.25,2.75L5.6,8.4L2.75,5.55L1.35,6.95L5.6,11.2Z"
+  );
+}
+
+.dads-checkbox__input:indeterminate::before {
+  display: block;
+  clip-path: path("M2,6h10v2H2Z");
+}
+
+.dads-checkbox__input:is(:disabled, [aria-disabled="true"]) {
+  --_base-color: var(--color-neutral-solid-gray-50);
+  --_accent-color: var(--color-neutral-solid-gray-300);
+  --_accent-hover-color: var(--color-neutral-solid-gray-300);
+  --_border-color: var(--color-neutral-solid-gray-300);
+  --_border-hover-color: var(--color-neutral-solid-gray-300);
+}
+
+.dads-checkbox__label {
+  padding-top: var(--_label-padding-top);
+  color: var(--color-neutral-solid-gray-800);
+  font-weight: normal;
+  font-size: var(--_label-font-size);
+  line-height: 1.3;
+  font-family: var(--font-family-sans);
+  letter-spacing: 0;
+}
+
+/* disclosure.css (for <details>/<summary>) */
+.dads-disclosure__summary {
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  gap: calc(8 / 16 * 1rem);
+  width: fit-content;
+  cursor: default;
+  list-style-type: none;
+}
+
+@media (hover: hover) {
+  .dads-disclosure__summary:hover {
+    text-decoration: underline;
+    text-underline-offset: calc(3 / 16 * 1rem);
+  }
+}
+
+.dads-disclosure__summary:focus-visible {
+  outline: calc(4 / 16 * 1rem) solid var(--color-neutral-black);
+  outline-offset: calc(2 / 16 * 1rem);
+  border-radius: calc(4 / 16 * 1rem);
+  background-color: var(--color-primitive-yellow-300);
+  box-shadow: 0 0 0 calc(2 / 16 * 1rem) var(--color-primitive-yellow-300);
+}
+
+.dads-disclosure__summary::marker {
+  content: "";
+}
+
+.dads-disclosure__summary::-webkit-details-marker {
+  display: none;
+}
+
+.dads-disclosure__icon {
+  flex-shrink: 0;
+  margin-top: calc((1lh - 24px) / 2);
+  color: var(--color-key-1000);
+}
+
+.dads-disclosure[open] .dads-disclosure__icon {
+  rotate: 180deg;
+}
+
+.dads-disclosure__content {
+  padding-left: calc(32 / 16 * 1rem);
+  margin: calc(16 / 16 * 1rem) 0;
+}
