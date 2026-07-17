@@ -28,7 +28,6 @@
   .panel h1 { font-size: 1rem; margin: 0 0 .4rem; }
   .panel .layers { margin: .5rem 0; }
   .panel .layer-item { margin-bottom: .5rem; }
-  .panel .layer-item label { display: block; }
   .panel .vlcm-legend { margin-top: .3rem; max-height: 12rem; overflow-y: auto; }
   .panel .legend-row { display: flex; align-items: center; gap: .4rem; font-size: .78rem; margin-bottom: .15rem; }
   .panel .legend-swatch { width: .9rem; height: .9rem; border-radius: 2px; flex: none; border: 1px solid rgba(0,0,0,.15); }
@@ -49,7 +48,7 @@
       <div class="layer-item">
         <label class="dads-checkbox" data-size="sm">
           <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="bvmap" checked></span>
-          <span class="dads-checkbox__label">国土地理院最適化ベクトルタイル</span>
+          <span class="dads-checkbox__label">最適化ベクトルタイル</span>
         </label>
       </div>
       <div class="layer-item">
@@ -70,11 +69,21 @@
           <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="seamlessphoto" checked></span>
           <span class="dads-checkbox__label">シームレス空中写真</span>
         </label>
+        <label class="dads-checkbox" data-size="sm" style="margin-left:1.5rem;">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" id="seamlessphoto-opaque"></span>
+          <span class="dads-checkbox__label">不透過</span>
+        </label>
       </div>
       <div class="layer-item">
         <label class="dads-checkbox" data-size="sm">
           <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" data-layer-toggle="mapterhorn" checked></span>
           <span class="dads-checkbox__label">陰影起伏図</span>
+        </label>
+      </div>
+      <div class="layer-item">
+        <label class="dads-checkbox" data-size="sm">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" id="terrain-toggle"></span>
+          <span class="dads-checkbox__label">三次元表示</span>
         </label>
       </div>
     </div>

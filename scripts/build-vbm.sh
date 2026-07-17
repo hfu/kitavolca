@@ -90,7 +90,9 @@ if ! jq -c '
             "layer": ($code | tostring)
         }
         |
-        if ($code == 7101 or $code == 7102 or $code == 7105 or $code == 7106 or $code == 7132 or $code == 7133 or $code == 7134 or $code == 7135) then
+        if ($code == 7101 or $code == 7105) then
+            .tippecanoe.minzoom = 11
+        elif ($code == 7102 or $code == 7106 or $code == 7132 or $code == 7133 or $code == 7134 or $code == 7135) then
             .tippecanoe.minzoom = 13
         elif ($code == 2101 or $code == 2103 or $code == 2106 or $code == 2107) then
             .tippecanoe.minzoom = 13

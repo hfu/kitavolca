@@ -112,6 +112,30 @@ fetch('style.json')
     }
     map.on('idle', updateLegend);
 
+    // Seamless photo opacity: an independent "不透過" checkbox layered on top of
+    // the existing visibility checkbox. The original raster-opacity expression
+    // (zoom-dependent, tuned so the photo doesn't overpower thematic layers) is
+    // captured once from the style before any mutation, so unchecking always
+    // restores the exact original expression rather than a hand-reconstructed one.
+    const originalSeamlessOpacity = style.layers.find(l => l.id === 'seamlessphoto')?.paint?.['raster-opacity'];
+    const opaqueToggle = document.getElementById('seamlessphoto-opaque');
+    opaqueToggle.addEventListener('change', () => {
+      map.setPaintProperty('seamlessphoto', 'raster-opacity', opaqueToggle.checked ? 1 : originalSeamlessOpacity);
+    });
+
+    // Terrain checkbox: independent from the layer-visibility checkboxes above
+    // (mapterhorn's hillshade layer toggles via data-layer-toggle, but terrain
+    // is map.setTerrain(), not a style layer). Listen for the 'terrain' event
+    // so the checkbox also follows the existing top-right TerrainControl
+    // button -- whichever control the user clicks, both stay in sync.
+    const terrainToggle = document.getElementById('terrain-toggle');
+    terrainToggle.addEventListener('change', () => {
+      map.setTerrain(terrainToggle.checked ? { source: 'mapterhorn', exaggeration: 1 } : null);
+    });
+    map.on('terrain', () => {
+      terrainToggle.checked = !!map.getTerrain();
+    });
+
     // Panel collapse toggle
     const panelEl = document.querySelector('.panel');
     const panelToggle = document.getElementById('panel-toggle');

@@ -1993,10 +1993,10 @@
       "type": "line",
       "source": "vbm",
       "source-layer": "7101",
-      "minzoom": 13,
+      "minzoom": 11,
       "paint": {
         "line-color": "#a06a3c",
-        "line-width": 1.2
+        "line-width": ["step", ["zoom"], 0.5, 13, 1.2]
       }
     },
     {
@@ -2004,34 +2004,32 @@
       "type": "line",
       "source": "vbm",
       "source-layer": "7105",
-      "minzoom": 13,
+      "minzoom": 11,
       "paint": {
         "line-color": "#a06a3c",
-        "line-width": 1.2
+        "line-width": ["step", ["zoom"], 0.5, 13, 1.2]
       }
     },
     {
       "id": "vbm-point-6221",
-      "type": "circle",
+      "type": "symbol",
       "source": "vbm",
       "source-layer": "6221",
-      "paint": {
-        "circle-color": "#d64545",
-        "circle-radius": 5,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
+      "layout": {
+        "icon-image": "噴火口・噴気口-20",
+        "icon-size": 0.8,
+        "icon-allow-overlap": true
       }
     },
     {
       "id": "vbm-point-6222",
-      "type": "circle",
+      "type": "symbol",
       "source": "vbm",
       "source-layer": "6222",
-      "paint": {
-        "circle-color": "#e07a3f",
-        "circle-radius": 4,
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1
+      "layout": {
+        "icon-image": "温泉-20",
+        "icon-size": 0.8,
+        "icon-allow-overlap": true
       }
     },
     {
@@ -2252,42 +2250,46 @@
     },
     {
       "id": "vbm-control-7301",
-      "type": "circle",
+      "type": "symbol",
       "source": "vbm",
       "source-layer": "7301",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
+      "layout": {
+        "icon-image": ["case", ["!=", ["get", "三角点標高"], null], "三角点-20", "水準点"],
+        "icon-size": 0.8,
+        "icon-allow-overlap": true
       }
     },
     {
       "id": "vbm-control-7302",
-      "type": "circle",
+      "type": "symbol",
       "source": "vbm",
       "source-layer": "7302",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
+      "layout": {
+        "icon-image": ["case", ["!=", ["get", "三角点標高"], null], "三角点-20", "水準点"],
+        "icon-size": 0.8,
+        "icon-allow-overlap": true
       }
     },
     {
       "id": "vbm-control-7303",
-      "type": "circle",
+      "type": "symbol",
       "source": "vbm",
       "source-layer": "7303",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
+      "layout": {
+        "icon-image": ["case", ["!=", ["get", "三角点標高"], null], "三角点-20", "水準点"],
+        "icon-size": 0.8,
+        "icon-allow-overlap": true
       }
     },
     {
       "id": "vbm-control-7308",
-      "type": "circle",
+      "type": "symbol",
       "source": "vbm",
       "source-layer": "7308",
-      "paint": {
-        "circle-color": "#000000",
-        "circle-radius": 3
+      "layout": {
+        "icon-image": ["case", ["!=", ["get", "三角点標高"], null], "三角点-20", "水準点"],
+        "icon-size": 0.8,
+        "icon-allow-overlap": true
       }
     },
     {

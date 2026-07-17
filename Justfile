@@ -148,8 +148,11 @@ validate:
         n=$(jq -c 'select(.properties["分類コード"] != null and .tippecanoe.layer == null)' "$vbm_ndjson" | wc -l | tr -d ' ')
         [ "$n" = "0" ] && echo "✓ 分類コードを持つ全 feature に tippecanoe.layer あり" || { echo "❌ tippecanoe.layer 欠落: ${n}件"; errors=$((errors + 1)); }
 
-        n=$(jq -c '.tippecanoe.layer as $l | select(["7101","7102","7105","7106","7132","7133","7134","7135","2101","2103","2106","2107","3001","3002","3003","3004"] | index($l)) | select(.tippecanoe.minzoom != 13)' "$vbm_ndjson" | wc -l | tr -d ' ')
-        [ "$n" = "0" ] && echo "✓ 等高線・道路・建物系コードは全て minzoom=13" || { echo "❌ 等高線・道路・建物系コードに minzoom=13 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
+        n=$(jq -c '.tippecanoe.layer as $l | select(["7101","7105"] | index($l)) | select(.tippecanoe.minzoom != 11)' "$vbm_ndjson" | wc -l | tr -d ' ')
+        [ "$n" = "0" ] && echo "✓ 計曲線コード(7101/7105)は全て minzoom=11" || { echo "❌ 計曲線コードに minzoom=11 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
+
+        n=$(jq -c '.tippecanoe.layer as $l | select(["7102","7106","7132","7133","7134","7135","2101","2103","2106","2107","3001","3002","3003","3004"] | index($l)) | select(.tippecanoe.minzoom != 13)' "$vbm_ndjson" | wc -l | tr -d ' ')
+        [ "$n" = "0" ] && echo "✓ 主曲線・道路・建物系コードは全て minzoom=13" || { echo "❌ 主曲線・道路・建物系コードに minzoom=13 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
 
         known="出典コード 出典レベル 分類コード 標高 水深 水深値 名称 注記 表示区分 三角点標高 水準点標高"
         unexpected=$(jq -r '.properties | keys[]' "$vbm_ndjson" | sort -u | while read -r k; do
