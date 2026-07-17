@@ -1993,7 +1993,7 @@
       "type": "line",
       "source": "vbm",
       "source-layer": "7101",
-      "minzoom": 11,
+      "minzoom": 9,
       "paint": {
         "line-color": "#a06a3c",
         "line-width": ["step", ["zoom"], 0.5, 13, 1.2]
@@ -2004,7 +2004,7 @@
       "type": "line",
       "source": "vbm",
       "source-layer": "7105",
-      "minzoom": 11,
+      "minzoom": 9,
       "paint": {
         "line-color": "#a06a3c",
         "line-width": ["step", ["zoom"], 0.5, 13, 1.2]
