@@ -32,6 +32,24 @@
   .panel .legend-row { display: flex; align-items: center; gap: .4rem; font-size: .78rem; margin-bottom: .15rem; }
   .panel .legend-swatch { width: .9rem; height: .9rem; border-radius: 2px; flex: none; border: 1px solid rgba(0,0,0,.15); }
   .panel .legend-empty { font-size: .78rem; color: #666; margin: .3rem 0 0; }
+
+  /* Feature popup: reuse the panel's DADS look (blurred white card, same
+     radius/elevation tokens, same font sizing) instead of MapLibre's default
+     plain white box, so the two floating UI pieces read as one system. */
+  .maplibregl-popup-content {
+    background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-12); box-shadow: var(--elevation-1);
+    font-family: system-ui, sans-serif; font-size: 0.82rem; line-height: 1.45;
+    padding: .7rem .8rem;
+  }
+  .maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: rgba(255, 255, 255, 0.92); }
+  .maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: rgba(255, 255, 255, 0.92); }
+  .feature-popup .dads-checkbox { padding-top: 0; padding-bottom: .35rem; }
+  .feature-popup table { width: 100%; border-collapse: collapse; }
+  .feature-popup td { vertical-align: top; padding: .3rem .3rem; border-bottom: 1px solid var(--color-neutral-solid-gray-300); font-size: .8rem; }
+  .feature-popup tr:last-child td { border-bottom: none; }
+  .feature-popup code { font-size: .72rem; color: var(--color-neutral-solid-gray-800); background: var(--color-neutral-solid-gray-50); padding: .05rem .35rem; border-radius: 4px; white-space: nowrap; }
+  .feature-popup .attr-empty { color: var(--color-neutral-solid-gray-600); font-style: italic; }
 </style>
 </head>
 <body>

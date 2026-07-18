@@ -59,18 +59,58 @@ fetch('style.json')
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     map.addControl(new maplibregl.TerrainControl({ source: 'mapterhorn', exaggeration: 1 }), 'top-right');
 
+    // Attribute filtering for the feature popup: VBM's and VLCM's raw
+    // properties mix human-readable text (名称/注記, VLCM's class1-6/name)
+    // with numeric/coded metadata (ID番号, 分類コード, 標高, 水深, three-角点
+    // 標高 etc.) that's meaningless without a code table. Default to only the
+    // former; the "詳細" checkbox reveals everything (unfiltered, as before).
+    const VBM_PUBLIC_KEYS = new Set(['名称', '注記']);
+    const VLCM_PUBLIC_KEYS = new Set(['name', 'class1', 'class2', 'class3', 'class4', 'class5', 'class6']);
+    const isVlcmSourceLayer = (sourceLayer) => sourceLayer === 'natural' || sourceLayer === 'artificial';
+
+    function publicFriendlyEntries(properties, sourceLayer) {
+      const allowed = isVlcmSourceLayer(sourceLayer) ? VLCM_PUBLIC_KEYS : VBM_PUBLIC_KEYS;
+      return Object.entries(properties).filter(([k, v]) => allowed.has(k) && v != null && v !== '');
+    }
+
+    function popupHTML(features, showAll) {
+      const rows = features.map((f) => {
+        const sourceLayer = f.layer['source-layer'] || f.layer.id;
+        const entries = showAll ? Object.entries(f.properties) : publicFriendlyEntries(f.properties, sourceLayer);
+        const attrText = entries.length
+          ? entries.map(([k, v]) => `${k}=${v}`).join(', ')
+          : '<span class="attr-empty">（表示できる属性なし）</span>';
+        return `<tr><td><code>${sourceLayer}</code></td><td>${attrText}</td></tr>`;
+      }).join('');
+      return `<div class="feature-popup">
+        <label class="dads-checkbox" data-size="sm">
+          <span class="dads-checkbox__checkbox"><input class="dads-checkbox__input" type="checkbox" id="popup-details-toggle"${showAll ? ' checked' : ''}></span>
+          <span class="dads-checkbox__label">詳細</span>
+        </label>
+        <table>${rows}</table>
+      </div>`;
+    }
+
+    // Remembers the "詳細" state across clicks (module-level, not per-popup),
+    // so once a user opts into full attributes they stay expanded on the next click.
+    let showAllAttributes = false;
+
     map.on('click', (e) => {
-      const features = map.queryRenderedFeatures(e.point);
+      const features = map.queryRenderedFeatures(e.point).slice(0, 8);
       if (!features.length) return;
-      const rows = features.slice(0, 8).map(f =>
-        `<tr><td><code>${f.layer['source-layer'] || f.layer.id}</code></td><td>${
-          Object.entries(f.properties).map(([k, v]) => `${k}=${v}`).join(', ')
-        }</td></tr>`
-      ).join('');
-      new maplibregl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(`<table style="font-size:12px">${rows}</table>`)
-        .addTo(map);
+      // addTo(map) must run before the first render(): popup.getElement()
+      // returns undefined until the popup's DOM is actually mounted, which
+      // would silently skip attaching the checkbox's change listener.
+      const popup = new maplibregl.Popup().setLngLat(e.lngLat).addTo(map);
+      const render = () => {
+        popup.setHTML(popupHTML(features, showAllAttributes));
+        const toggle = popup.getElement()?.querySelector('#popup-details-toggle');
+        toggle?.addEventListener('change', () => {
+          showAllAttributes = toggle.checked;
+          render();
+        });
+      };
+      render();
     });
 
     // Layer group checkboxes: only flips `visibility`, never reorders
