@@ -92,12 +92,27 @@ if ! jq -c '
         |
         if ($code == 7101 or $code == 7105) then
             .tippecanoe.minzoom = (if (.properties["標高"] // 1) % 100 == 0 then 9 else 11 end)
-        elif ($code == 7102 or $code == 7106 or $code == 7132 or $code == 7133 or $code == 7134 or $code == 7135) then
+        elif ($code == 7102 or $code == 7106 or ($code >= 7131 and $code <= 7135)) then
             .tippecanoe.minzoom = 13
         elif ($code == 2101 or $code == 2103 or $code == 2106 or $code == 2107) then
             .tippecanoe.minzoom = 13
         elif ($code == 3001 or $code == 3002 or $code == 3003 or $code == 3004) then
             .tippecanoe.minzoom = 13
+        elif (($code >= 5200 and $code <= 5299) or $code == 5265) then
+            # 水部構造物・砂防ダム: bvmapの水部構造物面(WStrA)がz8から出る設計に合わせる
+            .tippecanoe.minzoom = 8
+        elif (
+            $code == 5101 or $code == 5102 or $code == 5106 or
+            ($code >= 6210 and $code <= 6299) or
+            ($code >= 7300 and $code <= 7399) or
+            ($code >= 8100 and $code <= 8199) or
+            $code == 4257 or $code == 4265 or
+            ($code >= 2300 and $code <= 2399) or
+            ($code >= 3580 and $code <= 3589)
+        ) then
+            # 水涯線・点記号・三角点水準点・注記・送電線・鉄道・避難所等:
+            # 計曲線が密になるz11に合わせ、等高線が消えた後も居残らないようにする
+            .tippecanoe.minzoom = 11
         else
             .
         end

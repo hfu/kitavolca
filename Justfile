@@ -154,8 +154,25 @@ validate:
         n=$(jq -c '.tippecanoe.layer as $l | select(["7101","7105"] | index($l)) | select(((.properties["標高"] // 1) % 100 != 0) and .tippecanoe.minzoom != 11)' "$vbm_ndjson" | wc -l | tr -d ' ')
         [ "$n" = "0" ] && echo "✓ 計曲線コード(7101/7105)のうち標高100mの倍数以外は全て minzoom=11" || { echo "❌ 標高100mの倍数以外の計曲線に minzoom=11 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
 
-        n=$(jq -c '.tippecanoe.layer as $l | select(["7102","7106","7132","7133","7134","7135","2101","2103","2106","2107","3001","3002","3003","3004"] | index($l)) | select(.tippecanoe.minzoom != 13)' "$vbm_ndjson" | wc -l | tr -d ' ')
+        n=$(jq -c '.tippecanoe.layer as $l | select(["7102","7106","7131","7132","7133","7134","7135","2101","2103","2106","2107","3001","3002","3003","3004"] | index($l)) | select(.tippecanoe.minzoom != 13)' "$vbm_ndjson" | wc -l | tr -d ' ')
         [ "$n" = "0" ] && echo "✓ 主曲線・道路・建物系コードは全て minzoom=13" || { echo "❌ 主曲線・道路・建物系コードに minzoom=13 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
+
+        n=$(jq -c '.tippecanoe.layer as $l | (($l | tonumber?) // 0) as $code | select(($code >= 5200 and $code <= 5299) or $code == 5265) | select(.tippecanoe.minzoom != 8)' "$vbm_ndjson" | wc -l | tr -d ' ')
+        [ "$n" = "0" ] && echo "✓ 水部構造物・砂防ダムは全て minzoom=8" || { echo "❌ 水部構造物・砂防ダムに minzoom=8 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
+
+        n=$(jq -c '
+            .tippecanoe.layer as $l | (($l | tonumber?) // 0) as $code |
+            select(
+                $l == "5101" or $l == "5102" or $l == "5106" or
+                ($code >= 6210 and $code <= 6299) or
+                ($code >= 7300 and $code <= 7399) or
+                ($code >= 8100 and $code <= 8199) or
+                $l == "4257" or $l == "4265" or
+                ($code >= 2300 and $code <= 2399) or
+                ($code >= 3580 and $code <= 3589)
+            ) | select(.tippecanoe.minzoom != 11)
+        ' "$vbm_ndjson" | wc -l | tr -d ' ')
+        [ "$n" = "0" ] && echo "✓ 水涯線・点記号・三角点水準点・注記・送電線・鉄道・避難所等は全て minzoom=11" || { echo "❌ 該当コードに minzoom=11 が付与されていない feature: ${n}件"; errors=$((errors + 1)); }
 
         known="出典コード 出典レベル 分類コード 標高 水深 水深値 名称 注記 表示区分 三角点標高 水準点標高"
         unexpected=$(jq -r '.properties | keys[]' "$vbm_ndjson" | sort -u | while read -r k; do
