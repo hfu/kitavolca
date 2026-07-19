@@ -119,6 +119,17 @@
   - 誤: `properties.tippecanoe.minzoom`, `properties.tippecanoe.layer`
   - 正: feature 直下の `tippecanoe: { layer, minzoom }`
 - `.gitignore` は、`src/*.zip`, `dst/`, `work/`, 生成テストデータなどを除外する方針に調整済み
+- **2026-07-17〜18: Issue #2 対応 + minzoom階層のさらなる整理**（詳細は各コミット・`docs/schema.md`参照）
+  - 左上パネルのレイアウト崩れ修正・「三次元表示」チェックボックス追加・シームレス空中写真の「不透過」チェックボックス追加・VBM点記号のbvmapアイコン対応を実施し、[Issue #2](https://github.com/hfu/kitavolca/issues/2)をクローズ（`9ba13e1`, `295ff6d`）
+  - 「等高線は消えるのに水涯線・記号・注記はz5から無条件表示」という一貫性の欠如をユーザー指摘で発見。bvmap(最適化ベクトルタイル)のWStrA(z8)/WL(z16)分離設計を参考に、水部構造物→z8、水涯線・点記号・三角点水準点・注記・鉄道・送電線・避難所等→z11 の追加ティアを実装（`dc915a7`、詳細は`docs/schema.md`「2026-07-18追記」）
+  - `hfu/faceless-cartographer` から kitavolca の `vbm`/`vlcm` を利用できるか調査した結果、両リポジトリ・`hfu/stars`・`hfu/layers-martin` いずれにもコード変更は不要（Martinのディレクトリ自動検出＋faceless-cartographerのMap Intent複数カタログ対応が既に機能を満たしていた）と判明。検証はfaceless-cartographer側の[HANDOVER.md](https://github.com/hfu/faceless-cartographer/blob/main/HANDOVER.md)（2026-07-18）に記録
+- **2026-07-19: 吹き出し(popup)のデザイン統一＋属性フィルタリング（`a541973`）**
+  - 地物クリックの吹き出しがMapLibre既定の素朴な白箱で、左上パネルのDADSデザイン（blur背景・`--border-radius-12`・`--elevation-1`）と統一感が無かった。同じトークンで吹き出しを再スタイリング
+  - 吹き出しが `ID番号`/`分類コード`/`標高`/VLCMの`code`/`code1-6`等、コード表無しには意味不明な生の数値属性を無条件に一覧していた。VBMは`名称`/`注記`、VLCMは`class1-6`/`name`（例:「1739年火砕流堆積地形」）のみを既定表示にし、「詳細」チェックボックス（パネルと同じ`.dads-checkbox`）で全属性表示に切り替えられるようにした。選択状態はセッション内で記憶
+  - 実装中、`popup.getElement()` を `addTo(map)` より前に呼んでいたため詳細チェックボックスへのイベントリスナー登録が失敗するバグを発見・修正（`getElement()`はDOM未マウント時`undefined`を返すため、`addTo()`を先に呼ぶ必要がある）
+  - `hfu/faceless-cartographer` に同様の機能を反映できるか検討。デザイン面は移植可能だが、属性フィルタリングはVBM/VLCM固有のスキーマ知識が前提のため、汎用カタログ対応方針（同リポジトリ DECISIONS.md D23）と衝突すると判断し、機能追加は見送り（判断根拠は同リポジトリ DECISIONS.md バックログに記録）
+  - 逆に、faceless-cartographer側で使っていた `.notice`/`.notice.error`（DADSセマンティックエラー色）パターンを、kitavolca側の `style.json` 読み込み失敗表示（従来はアドホックな`color:#b00`）に移植した
+  - 副次的に、faceless-cartographer側の`index.html`に、kitavolcaで既に修正済みだったのと同一のチェックボックス改行崩れバグ（`.panel .layer-item label { display: block; }` がDADSのflexレイアウトを上書き）が残っていることを発見し、修正した（同リポジトリ DECISIONS.md D38）
 
 ---
 

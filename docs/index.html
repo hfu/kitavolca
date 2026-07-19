@@ -11,6 +11,11 @@
 <style>
   html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
   #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  /* Ported from faceless-cartographer's index.html: DADS semantic-color
+     notice box, used here for the style.json load-failure message instead
+     of an ad-hoc inline color. */
+  .notice { border-radius: var(--border-radius-8); padding: .5rem .6rem; margin: .4rem 0; font-size: 0.82rem; }
+  .notice.error { color: var(--color-semantic-error-1); background: rgba(236, 0, 0, 0.08); }
   .panel {
     position: absolute; top: 0; left: 0; max-width: 22rem; max-height: 100vh;
     display: flex; flex-direction: column;

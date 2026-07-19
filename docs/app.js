@@ -188,6 +188,6 @@ fetch('style.json')
   .catch(err => {
     const content = document.querySelector('.panel__content');
     if (content) {
-      content.innerHTML += `<div style="color:#b00">style.json の読み込みに失敗: ${err}</div>`;
+      content.innerHTML += `<div class="notice error">style.json の読み込みに失敗: ${err}</div>`;
     }
   });
